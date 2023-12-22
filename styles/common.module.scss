@@ -1,0 +1,34 @@
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  --header-height: 70px;
+  --nav-height: 50px;
+  --footer-height: 60px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  header {
+    text-align: center;
+  }
+  main {
+    height: calc(
+      100% - var(--header-height) - var(--nav-height) - var(--footer-height)
+    );
+    p {
+      text-align: center;
+    }
+  }
+  footer {
+    padding: 10px;
+    a {
+      color: var(----black-sm);
+    }
+    .logo {
+      height: 1em;
+    }
+  }
+}

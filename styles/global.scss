@@ -1,3 +1,7 @@
+:root {
+  --black-sm: #494949;
+}
+
 html,
 body {
   padding: 0;
@@ -18,8 +22,13 @@ body {
 }
 
 a {
-  color: inherit;
+  color: #0070f3;
   text-decoration: none;
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: underline;
+  }
 }
 
 * {

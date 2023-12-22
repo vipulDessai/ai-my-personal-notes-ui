@@ -3,14 +3,24 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "start": "next start"
+    "start": "next start",
+    "pretty": "prettier --write ./styles/* ./styles/**/* ./pages/* ./pages/**/* --ignore-unknown",
+    "prettier:watch": "onchange \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}"
   },
   "dependencies": {
     "next": "latest",
+    "onchange": "^7.1.0",
+    "prettier": "^3.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "20.10.5",
+    "@types/react": "18.2.45",
+    "sass": "^1.69.5",
+    "typescript": "5.3.3"
   }
 }
