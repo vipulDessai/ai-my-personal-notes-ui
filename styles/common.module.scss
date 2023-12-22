@@ -1,12 +1,17 @@
-.flexCenter {
+.flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+.links-group {
+  list-style: none;
+  text-align: center;
+  padding: 0;
+}
 
 .container {
   --header-height: 80px;
-  --nav-height: 50px;
+  --nav-height: 70px;
   --footer-height: 60px;
   position: absolute;
   width: 100%;

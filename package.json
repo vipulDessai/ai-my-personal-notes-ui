@@ -8,6 +8,7 @@
     "prettier:watch": "onchange \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}"
   },
   "dependencies": {
+    "@fluentui/react": "^8.113.1",
     "next": "latest",
     "onchange": "^7.1.0",
     "prettier": "^3.1.1",
