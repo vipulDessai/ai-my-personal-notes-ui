@@ -1,1 +1,3 @@
-This is a starter template for [Learn Next.js](https://nextjs.org/learn).
+# ai my personal notes ui
+
+my personal notes managing app powered by AI
