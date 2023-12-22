@@ -1,7 +1,10 @@
 import Head from "next/head";
 import Link from "next/link";
+import Image from "next/image";
 
 import commonStyles from "../styles/common.module.scss";
+
+import logoSvg from "../public/note-manager-app-main-logo.svg";
 
 export default function Home() {
   return (
@@ -12,7 +15,11 @@ export default function Home() {
       </Head>
 
       <header>
-        <img src="/vercel.svg" alt="Vercel" className={commonStyles.logo} />
+        <Image
+          alt="Follow us on Twitter"
+          src={logoSvg}
+          className={commonStyles["app-logo"]}
+        ></Image>
       </header>
 
       <nav>
