@@ -12,8 +12,8 @@ import {
   ListItemText,
 } from "@mui/material";
 
-import { iconComponents } from "./";
-import { pageTitles } from "../utils/";
+import { iconComponents } from ".";
+import { pageTitles } from "./utils";
 
 const { InboxIcon, MailIcon, MenuIcon } = iconComponents;
 

@@ -2,8 +2,7 @@ import Head from "next/head";
 
 import commonStyles from "../styles/common.module.scss";
 
-import { Header, Footer } from "./components";
-import { pageTitles } from "./utils";
+import { Header, Footer, pageTitles } from "../components";
 
 export default function Home() {
   return (

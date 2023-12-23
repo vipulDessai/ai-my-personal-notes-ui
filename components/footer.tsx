@@ -1,4 +1,4 @@
-import commonStyles from "../../styles/common.module.scss";
+import commonStyles from "../styles/common.module.scss";
 
 export const Footer = () => {
   return (

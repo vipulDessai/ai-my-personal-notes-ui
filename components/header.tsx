@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import hedearStyles from "./header.module.scss";
 
-import { SidePanel, svg } from "./";
+import { SidePanel, svg } from ".";
 
 export const Header = () => {
   return (
