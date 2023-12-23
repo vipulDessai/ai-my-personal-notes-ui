@@ -8,7 +8,11 @@
     "prettier:watch": "onchange \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}"
   },
   "dependencies": {
-    "@fluentui/react": "^8.113.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.15.1",
+    "@mui/material": "^5.15.1",
     "next": "latest",
     "onchange": "^7.1.0",
     "prettier": "^3.1.1",

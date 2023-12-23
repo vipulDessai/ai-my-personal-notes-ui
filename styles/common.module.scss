@@ -11,22 +11,12 @@
 
 .container {
   --header-height: 80px;
-  --nav-height: 70px;
-  --footer-height: 60px;
+  --footer-height: 70px;
   position: absolute;
   width: 100%;
   height: 100%;
-  header {
-    text-align: center;
-    padding: 10px;
-    .app-logo {
-      width: 60px;
-    }
-  }
   main {
-    height: calc(
-      100% - var(--header-height) - var(--nav-height) - var(--footer-height)
-    );
+    height: calc(100% - var(--header-height) - var(--footer-height));
     p {
       text-align: center;
     }

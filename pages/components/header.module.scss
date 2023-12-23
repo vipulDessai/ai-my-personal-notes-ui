@@ -1,0 +1,10 @@
+header.app-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  .app-logo {
+    width: 60px;
+  }
+}
