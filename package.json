@@ -4,8 +4,10 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "pretty": "prettier --write ./components/* ./components/**/* ./styles/* ./styles/**/* ./pages/* ./pages/**/* --ignore-unknown",
-    "prettier:watch": "onchange \"./components/*\" \"./components/**/*\" \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}"
+    "pretty": "prettier --write ./__tests__/* ./__tests__/**/* ./__mocks__/* ./__mocks__/**/* ./components/* ./components/**/* ./styles/* ./styles/**/* ./pages/* ./pages/**/* --ignore-unknown",
+    "prettier:watch": "onchange  \"./__tests__/*\" \"./__tests__/**/*\" \"./__mocks__/*\" \"./__mocks__/**/*\" \"./components/*\" \"./components/**/*\" \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -23,8 +25,15 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@types/jest": "^29.5.11",
     "@types/node": "20.10.5",
     "@types/react": "18.2.45",
+    "babel-jest": "^29.7.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "sass": "^1.69.5",
     "typescript": "5.3.3"
   }
