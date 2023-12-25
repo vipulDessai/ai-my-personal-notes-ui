@@ -15,5 +15,8 @@ my personal notes managing app powered by AI
 - geo location
 
 # TODO
-- [ ] Add redux
-- [ ] Add unit test cases
+- [x] Add redux
+- [x] Add unit test cases
+- [ ] integrate api
+- [ ] add git workflows
+    - [x] add linter

@@ -1,4 +1,8 @@
+import Image from "next/image";
+
 import commonStyles from "../styles/common.module.scss";
+
+import { svg } from "./utils/icons";
 
 export const Footer = () => {
   return (
@@ -10,7 +14,11 @@ export const Footer = () => {
         rel="noopener noreferrer"
       >
         <span>Powered by</span>
-        <img src="/vercel.svg" alt="Vercel" className={commonStyles.logo} />
+        <Image
+          src={svg.vercelLogo}
+          alt="Vercel"
+          className={commonStyles.logo}
+        />
       </a>
     </footer>
   );

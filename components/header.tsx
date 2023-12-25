@@ -10,7 +10,7 @@ export const Header = () => {
       <section>
         <Image
           alt="app logo"
-          src={svg.logoSvg}
+          src={svg.logo}
           className={hedearStyles["app-logo"]}
         ></Image>
       </section>
