@@ -60,7 +60,7 @@ export function SidePanel() {
         <ListItem disablePadding>
           <ListItemButton
             onClick={(e) => {
-              router.push("/add");
+              router.push("/add-note");
             }}
           >
             <ListItemIcon>
@@ -75,7 +75,7 @@ export function SidePanel() {
 
   return (
     <nav>
-      <IconButton aria-label="side mene" onClick={toggleDrawer(true)}>
+      <IconButton aria-label="side menu" onClick={toggleDrawer(true)}>
         <MenuIcon />
       </IconButton>
       <Drawer anchor={"left"} open={showSideMenu} onClose={toggleDrawer(false)}>

@@ -1,3 +1,5 @@
+import { Provider } from "react-redux";
+
 // dependency for material ui plugin
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -6,6 +8,12 @@ import "@fontsource/roboto/700.css";
 
 import "../styles/global.scss";
 
+import { globalStore } from "../components/stores/global.store";
+
 export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  return (
+    <Provider store={globalStore}>
+      <Component {...pageProps} />;
+    </Provider>
+  );
 }
