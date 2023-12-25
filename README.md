@@ -17,6 +17,7 @@ my personal notes managing app powered by AI
 # TODO
 - [x] Add redux
 - [x] Add unit test cases
-- [ ] integrate api
-- [ ] add git workflows
-    - [x] add linter
+- [x] add linter
+- [x] integrate api
+- [-] git workflows
+    - [ ] fix "act(...) is not supported in production builds of React."
