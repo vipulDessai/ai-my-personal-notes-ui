@@ -60,7 +60,7 @@ export function SidePanel() {
         <ListItem disablePadding>
           <ListItemButton
             onClick={(e) => {
-              router.push("/add");
+              router.push("/add-note");
             }}
           >
             <ListItemIcon>
