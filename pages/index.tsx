@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <div className={commonStyles.container}>
       <Head>
-        <title>Home</title>
+        <title>{pageTitles.HOME}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

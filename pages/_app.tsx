@@ -13,7 +13,7 @@ import { globalStore } from "../components/stores/global.store";
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={globalStore}>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </Provider>
   );
 }

@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <div className={commonStyles.container}>
       <Head>
-        <title>Add Note</title>
+        <title>{pageTitles.ADD_NOTE}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
