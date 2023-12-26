@@ -5,12 +5,9 @@ import { useSelector, useDispatch } from "react-redux";
 import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
 
-import { Header, Footer, pageTitles } from "../components";
-import type { RootState } from "../components/stores/global.store";
-import {
-  decrement,
-  increment,
-} from "../components/stores/features/counter.slice";
+import { Header, Footer } from "../components";
+import { pageTitles } from "../components/utils";
+import { decrement, increment, RootState } from "../components/stores";
 
 export default function Home() {
   const count = useSelector((state: RootState) => state.counter.value);
