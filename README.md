@@ -23,3 +23,5 @@ my personal notes managing app powered by AI
 - [x] integrate api
 - [x] git workflows
 - [ ] git workflows - fix "act(...) is not supported in production builds of React."
+- [ ] learn more about material UI theme 
+    - import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
