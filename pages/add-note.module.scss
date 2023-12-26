@@ -1,3 +1,14 @@
-.counter-example {
-  text-align: center;
+.note-catcher {
+  position: relative;
+  .floating-add-note-inputs {
+    position: absolute;
+    bottom: 0px;
+    right: 18px;
+  }
+  .note-pad {
+    position: relative;
+    .textfield-holder {
+      position: absolute;
+    }
+  }
 }
