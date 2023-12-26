@@ -1,19 +1,25 @@
+import { useState } from "react";
+import { Button } from "@mui/material";
 import Head from "next/head";
+import { useDispatch } from "react-redux";
 
 import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
-import { Header, Footer, pageTitles } from "../components";
-import { Button } from "@mui/material";
-import { useState } from "react";
-import { getData } from "../components/utils/api-caller.helper";
+import { Header, Footer } from "../components";
+import { pageTitles, getData, errorHandler } from "../components/utils";
+import { hideLoader, setError, showLoader } from "../components/stores";
 
 export default function Home() {
+  const dispatch = useDispatch();
+
   const defualtRetuarantnNamesValue: string[] = [];
   const [restuarantNames, setRestuarantNames] = useState(
     defualtRetuarantnNamesValue,
   );
+
   const makeApiCallTest = async (e) => {
+    dispatch(showLoader());
     try {
       const res = await getData(
         "https://oawjhv45uxgiecznjtfd5twnja0yuxtq.lambda-url.us-east-1.on.aws",
@@ -27,14 +33,15 @@ export default function Home() {
 
       setRestuarantNames(normalizedRestuarantsData);
     } catch (error) {
-      console.error(error);
+      dispatch(setError(errorHandler(error)));
     }
+    dispatch(hideLoader());
   };
 
   return (
     <div className={commonStyles.container}>
       <Head>
-        <title>Home</title>
+        <title>{pageTitles.HOME}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

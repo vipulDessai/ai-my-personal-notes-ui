@@ -13,11 +13,13 @@ my personal notes managing app powered by AI
 - tags
 - people profile
 - geo location
+- save as draft
+- should allow adding people, or links or whatever to the notes as refs
 
 # TODO
 - [x] Add redux
 - [x] Add unit test cases
 - [x] add linter
 - [x] integrate api
-- [-] git workflows
-    - [ ] fix "act(...) is not supported in production builds of React."
+- [x] git workflows
+- [ ] git workflows - fix "act(...) is not supported in production builds of React."

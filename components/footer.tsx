@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import commonStyles from "../styles/common.module.scss";
 
-import { svg } from "./utils/icons";
+import { svg } from "./utils";
 
 export const Footer = () => {
   return (

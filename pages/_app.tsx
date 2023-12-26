@@ -8,12 +8,14 @@ import "@fontsource/roboto/700.css";
 
 import "../styles/global.scss";
 
-import { globalStore } from "../components/stores/global.store";
+import { globalStore } from "../components/stores";
+import { CommonFeedbackComponents } from "../components";
 
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={globalStore}>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
+      <CommonFeedbackComponents />
     </Provider>
   );
 }
