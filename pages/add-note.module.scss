@@ -7,8 +7,24 @@
   }
   .note-pad {
     position: relative;
-    .textfield-holder {
+    .formfield-holder {
       position: absolute;
+      .menu {
+        position: absolute;
+        right: 0;
+        transform: translateX(50%);
+      }
+      .move-field {
+        position: absolute;
+        left: 0;
+        transform: translateX(-50%);
+      }
     }
   }
+}
+
+// placed outside because the menu is a react portal
+.note-catcher-form-field-menu-icon {
+  width: 35px;
+  display: inline-flex;
 }
