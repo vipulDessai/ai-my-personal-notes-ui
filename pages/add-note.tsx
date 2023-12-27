@@ -8,7 +8,7 @@ import addNoteStyles from "./add-note.module.scss";
 import { Header, Footer } from "../components";
 import { iconComponents, pageTitles } from "../components/utils";
 
-const { PlusIcon } = iconComponents;
+const { PlusIcon, MoreVertIcon } = iconComponents;
 
 interface InputFieldData {
   key: number;
@@ -19,7 +19,7 @@ interface AllInputsData {
   inputs: InputFieldData[];
 }
 
-export default function Home({}) {
+export default function AddNote({}) {
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
 
   const defaultInputFieldsInNoteCatcherDat: AllInputsData = {
@@ -54,6 +54,9 @@ export default function Home({}) {
         className={addNoteStyles["textfield-holder"]}
         style={{ marginLeft: inputField.marginLeft, width: inputField.width }}
       >
+        <Fab size="small" color="primary" aria-label="inputs options">
+          <MoreVertIcon />
+        </Fab>
         <TextField
           label={`input-${inputField.key}`}
           multiline

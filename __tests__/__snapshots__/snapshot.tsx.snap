@@ -39,6 +39,21 @@ exports[`renders homepage unchanged 1`] = `
       <p>
         Home
       </p>
+      <section
+        class="api-call-tester"
+      >
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium css-1rwt2y5-MuiButtonBase-root-MuiButton-root"
+          tabindex="0"
+          type="button"
+        >
+          API call
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+        <ul />
+      </section>
     </main>
     <footer>
       <a
@@ -50,11 +65,6 @@ exports[`renders homepage unchanged 1`] = `
         <span>
           Powered by
         </span>
-        <img
-          alt="Vercel"
-          class="logo"
-          src="/vercel.svg"
-        />
       </a>
     </footer>
   </div>
