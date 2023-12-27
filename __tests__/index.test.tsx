@@ -7,6 +7,7 @@ import { useRouter } from "../__mocks__/next/router";
 
 describe("Home", () => {
   it("renders a heading", () => {
+    // TODO: remove this meaning less mocker test 😁
     useRouter.mockImplementation(() => [{ foo: "bar" }]);
 
     render(<Home />);

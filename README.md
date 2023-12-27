@@ -1,8 +1,8 @@
-# ai my personal notes ui
+# AI My Personal Notes - UI Repository
 
-my personal notes managing app powered by AI
+My personal notes managing app powered by AI
 
-## note catcher
+## Note catcher
 - add title
 - click anywhere and just type
 - rearrange all these typing
@@ -14,7 +14,9 @@ my personal notes managing app powered by AI
 - people profile
 - geo location
 - save as draft
-- should allow adding people, or links or whatever to the notes as refs
+- should allow adding people, places (state, area etc) or links or whatever to the notes as refs
+- news that will complete in a future date
+    - somehow tracker for the same
 
 # TODO
 - [x] Add redux
