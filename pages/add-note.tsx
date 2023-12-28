@@ -1,4 +1,4 @@
-import { useRef, useState, forwardRef, Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import {
   Button,
@@ -23,6 +23,9 @@ const {
   DragIndicatorIcon,
   SettingsEthernetIcon,
   DeleteIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  DoneIcon,
 } = iconComponents;
 
 type InputTypes = "input" | "image" | "map";
@@ -30,16 +33,28 @@ type InputTypes = "input" | "image" | "map";
 interface InputFieldInfo {
   type: InputTypes;
   key: string;
+  label: string;
   style: {
-    width: string;
-    left: string;
-    top: string;
+    width: number;
+    left: number;
   };
   repositionElement: boolean;
+  resizeElement: boolean;
+  tags: string[];
 }
 interface NoteCatcherFieldsData {
   formFields: Map<string, InputFieldInfo>;
 }
+
+interface NoteCatcherFieldsHierarchy {
+  key: string;
+  childFields: NoteCatcherFieldsHierarchy[];
+}
+
+const FORM_FIELD_RESIZE_DIRECTION = {
+  LEFT: "left",
+  RIGHT: "right",
+};
 
 export default function AddNote({}) {
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
@@ -51,27 +66,45 @@ export default function AddNote({}) {
   const [noteCatcherRepositoiningElemKey, setNoteCatcherRepositoiningElemKey] =
     useState("");
 
+  const defaultNoteCatcherFormFieldHierachy: NoteCatcherFieldsHierarchy[] = [];
+  const [noteCatcherFormFieldHierachy, setNoteCatcherFormFieldHierachy] =
+    useState(defaultNoteCatcherFormFieldHierachy);
+
   const addInput = (e) => {
     const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
-    const formFieldCount = inputFieldsInNoteCatcherReplica.formFields.size;
+    const noteCatcherFormFieldHierachyReplica = [
+      ...noteCatcherFormFieldHierachy,
+    ];
 
     const elemKey = generateUUID();
+
+    noteCatcherFormFieldHierachyReplica.push({
+      key: elemKey,
+      childFields: [],
+    });
+    setNoteCatcherFormFieldHierachy(noteCatcherFormFieldHierachyReplica);
+
     inputFieldsInNoteCatcherReplica.formFields.set(elemKey, {
       key: elemKey,
+      label: noteCatcherFormFieldHierachyReplica.length.toString(),
       type: "input",
       style: {
-        width: "300px",
-        left: "50px",
-        top: `${formFieldCount * 100}px`,
+        width: 300,
+        left: 50,
       },
       repositionElement: false,
+      resizeElement: false,
+      tags: [],
     });
 
     setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
   };
-  const onMouseUpInNoteCatcher = (e: React.MouseEvent) => {
-    const newMousePositionY = `${e.clientY - 160}px`;
-    const newMousePositionX = `${e.clientX - 90}px`;
+  const setNewPositionNoteCatcherField = (e: React.MouseEvent) => {
+    // TODO: use the vertical position value for repositioning the form field vertically
+    const newMousePositionY = e.clientY - 160;
+    const newMousePositionX = e.clientX - 90;
+
+    console.log(newMousePositionY);
 
     const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
     const formFieldDataReplica = inputFieldsInNoteCatcherReplica.formFields.get(
@@ -80,7 +113,6 @@ export default function AddNote({}) {
 
     if (formFieldDataReplica) {
       formFieldDataReplica.repositionElement = false;
-      formFieldDataReplica.style.top = newMousePositionY;
       formFieldDataReplica.style.left = newMousePositionX;
       inputFieldsInNoteCatcherReplica.formFields.set(
         noteCatcherRepositoiningElemKey,
@@ -90,6 +122,45 @@ export default function AddNote({}) {
       setNoteCatcherRepositoiningElemKey("");
       setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
     }
+  };
+  const performResizeOnFormField = (elemKey: string, direction: string) => {
+    setNoteCatcherRepositoiningElemKey(elemKey);
+
+    const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
+    const formFieldDataReplica =
+      inputFieldsInNoteCatcherReplica.formFields.get(elemKey);
+
+    if (formFieldDataReplica) {
+      if (direction === FORM_FIELD_RESIZE_DIRECTION.LEFT) {
+        formFieldDataReplica.style.width += 100;
+      } else {
+        formFieldDataReplica.style.width -= 100;
+      }
+
+      inputFieldsInNoteCatcherReplica.formFields.set(
+        elemKey,
+        formFieldDataReplica,
+      );
+    }
+
+    setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
+  };
+  const resizeOnFormField = (elemKey: string, status: boolean) => {
+    setNoteCatcherRepositoiningElemKey(status ? elemKey : "");
+
+    const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
+    const formFieldDataReplica =
+      inputFieldsInNoteCatcherReplica.formFields.get(elemKey);
+
+    if (formFieldDataReplica) {
+      formFieldDataReplica.resizeElement = status;
+      inputFieldsInNoteCatcherReplica.formFields.set(
+        elemKey,
+        formFieldDataReplica,
+      );
+    }
+
+    setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
   };
   const enableRepositionOnFormField = (elemKey: string) => {
     setNoteCatcherRepositoiningElemKey(elemKey);
@@ -112,6 +183,8 @@ export default function AddNote({}) {
     const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
     inputFieldsInNoteCatcherReplica.formFields.delete(elemKey);
     setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
+
+    // TODO - delete key from noteCatcherFormFieldHierachyReplica
   };
 
   const constructedformFieldComponents: JSX.Element[] = [];
@@ -122,6 +195,8 @@ export default function AddNote({}) {
         data={formFieldElem}
         enableRepositionOnFormField={enableRepositionOnFormField}
         deleteNoteCatcherFormField={deleteNoteCatcherFormField}
+        performResizeOnFormField={performResizeOnFormField}
+        resizeOnFormField={resizeOnFormField}
       />,
     );
   }
@@ -136,8 +211,12 @@ export default function AddNote({}) {
       <Header />
 
       <main
-        className={addNoteStyles["note-catcher"]}
-        onClick={onMouseUpInNoteCatcher}
+        className={`${addNoteStyles["note-catcher"]} ${
+          noteCatcherRepositoiningElemKey
+            ? addNoteStyles["reposition-form-fields-enabled"]
+            : ""
+        }`}
+        onClick={setNewPositionNoteCatcherField}
       >
         <section className={addNoteStyles["note-pad"]}>
           <section className={addNoteStyles["note-pad-overflow-content"]}>
@@ -172,14 +251,18 @@ interface NoteCatcherFormFieldType {
   data: InputFieldInfo;
   enableRepositionOnFormField: (elemKey: string) => void;
   deleteNoteCatcherFormField: (elemKey: string) => void;
+  performResizeOnFormField: (elemKey: string, direction: string) => void;
+  resizeOnFormField: (elemKey: string, status: boolean) => void;
 }
 
 const NoteCatcherFormFieldForwarded = ({
   data,
   enableRepositionOnFormField,
   deleteNoteCatcherFormField,
+  performResizeOnFormField,
+  resizeOnFormField,
 }: NoteCatcherFormFieldType) => {
-  const { key, style, type, repositionElement } = data;
+  const { key, style, type, repositionElement, label, resizeElement } = data;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOnMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -203,6 +286,19 @@ const NoteCatcherFormFieldForwarded = ({
     deleteNoteCatcherFormField(key);
   };
 
+  const enableResizeOnFormFieldChild = (e) => {
+    handleClose();
+    resizeOnFormField(key, true);
+  };
+  const performResizeOnFormFieldChild = (e, direction: string) => {
+    handleClose();
+    performResizeOnFormField(key, direction);
+  };
+  const setResizeOnFormFieldChild = (e) => {
+    handleClose();
+    resizeOnFormField(key, false);
+  };
+
   const openMenu = Boolean(anchorEl);
 
   switch (type) {
@@ -211,20 +307,64 @@ const NoteCatcherFormFieldForwarded = ({
         <section
           className={addNoteStyles["formfield-holder"]}
           style={{
-            left: style.left,
-            width: style.width,
-            top: style.top,
+            left: `${style.left}px`,
+            width: `${style.width}px`,
           }}
         >
-          <Fab
-            className={addNoteStyles["menu"]}
-            size="small"
-            color="primary"
-            aria-label="inputs options"
-            onClick={handleOnMenuClick}
-          >
-            <MoreVertIcon />
-          </Fab>
+          {!resizeElement && !repositionElement && (
+            <>
+              <Fab
+                className={addNoteStyles["menu"]}
+                size="small"
+                color="primary"
+                aria-label="inputs options"
+                onClick={handleOnMenuClick}
+              >
+                <MoreVertIcon />
+              </Fab>
+            </>
+          )}
+          {resizeElement && (
+            <>
+              <Fab
+                className={addNoteStyles["resize-left"]}
+                size="small"
+                color="primary"
+                aria-label="inputs resize left"
+                onClick={(e) =>
+                  performResizeOnFormFieldChild(
+                    e,
+                    FORM_FIELD_RESIZE_DIRECTION.LEFT,
+                  )
+                }
+              >
+                <ArrowLeftIcon />
+              </Fab>
+              <Fab
+                className={addNoteStyles["resize-done"]}
+                size="small"
+                color="primary"
+                aria-label="inputs resize done"
+                onClick={setResizeOnFormFieldChild}
+              >
+                <DoneIcon />
+              </Fab>
+              <Fab
+                className={addNoteStyles["resize-right"]}
+                size="small"
+                color="primary"
+                aria-label="inputs resize right"
+                onClick={(e) =>
+                  performResizeOnFormFieldChild(
+                    e,
+                    FORM_FIELD_RESIZE_DIRECTION.RIGHT,
+                  )
+                }
+              >
+                <ArrowRightIcon />
+              </Fab>
+            </>
+          )}
           {repositionElement && (
             <Fab
               className={addNoteStyles["move-field"]}
@@ -235,12 +375,7 @@ const NoteCatcherFormFieldForwarded = ({
               <SettingsEthernetIcon />
             </Fab>
           )}
-          <TextField
-            label={`input-${key}`}
-            multiline
-            margin="normal"
-            fullWidth
-          />
+          <TextField label={label} margin="normal" multiline fullWidth />
           <Menu
             MenuListProps={{
               "aria-labelledby": "demo-customized-button",
@@ -249,6 +384,14 @@ const NoteCatcherFormFieldForwarded = ({
             open={openMenu}
             onClose={handleClose}
           >
+            <MenuItem onClick={enableResizeOnFormFieldChild} disableRipple>
+              <span
+                className={addNoteStyles["note-catcher-form-field-menu-icon"]}
+              >
+                <SettingsEthernetIcon />
+              </span>
+              Resize
+            </MenuItem>
             <MenuItem onClick={dragNoteCatcherFormField} disableRipple>
               <span
                 className={addNoteStyles["note-catcher-form-field-menu-icon"]}
@@ -283,9 +426,8 @@ const NoteCatcherFormFieldForwarded = ({
         <section
           className={addNoteStyles["formfield-holder"]}
           style={{
-            left: style.left,
-            width: style.width,
-            top: style.top,
+            left: `${style.left}px`,
+            width: `${style.width}px`,
           }}
         >
           <Fab size="small" color="primary" aria-label="inputs options">

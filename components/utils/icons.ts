@@ -7,6 +7,9 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import SettingsEthernetIcon from "@mui/icons-material/SettingsEthernet";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import DoneIcon from "@mui/icons-material/Done";
 /** Material UI Icons <END> */
 
 import logo from "../../public/note-manager-app-main-logo.svg";
@@ -26,4 +29,7 @@ export const iconComponents = {
   DragIndicatorIcon,
   SettingsEthernetIcon,
   DeleteIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  DoneIcon,
 };

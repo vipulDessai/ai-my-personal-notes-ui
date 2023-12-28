@@ -11,7 +11,7 @@
     overflow: auto;
     .note-pad-overflow-content {
       .formfield-holder {
-        position: absolute;
+        position: relative;
         .menu {
           position: absolute;
           right: 0;
@@ -19,8 +19,36 @@
         }
         .move-field {
           position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        .resize-left {
+          position: absolute;
           left: 0;
-          transform: translateX(-50%);
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        .resize-right {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translate(50%, -50%);
+        }
+        .resize-done {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+    }
+  }
+  &.reposition-form-fields-enabled {
+    .note-pad {
+      .note-pad-overflow-content {
+        .formfield-holder {
+          z-index: -1;
         }
       }
     }
