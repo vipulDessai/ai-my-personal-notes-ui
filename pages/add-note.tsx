@@ -21,8 +21,8 @@ const {
   PlusIcon,
   MoreVertIcon,
   DragIndicatorIcon,
-  AddCardIcon,
   SettingsEthernetIcon,
+  DeleteIcon,
 } = iconComponents;
 
 type InputTypes = "input" | "image" | "map";
@@ -32,65 +32,96 @@ interface InputFieldInfo {
   key: string;
   style: {
     width: string;
-    marginLeft: string;
+    left: string;
     top: string;
   };
+  repositionElement: boolean;
 }
 interface NoteCatcherFieldsData {
-  formFields: Set<InputFieldInfo>;
+  formFields: Map<string, InputFieldInfo>;
 }
 
 export default function AddNote({}) {
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
-  const noteCatcherCurrentlyMovableField = useRef<HTMLDivElement>();
-  const [enableDragOnFieldElement, setEnableDragOnFieldElement] =
-    useState(false);
-
   const defaultInputFieldsInNoteCatcherDat: NoteCatcherFieldsData = {
-    formFields: new Set(),
+    formFields: new Map(),
   };
   const [inputFieldsInNoteCatcherData, setInputFieldsInNoteCatcherData] =
     useState(defaultInputFieldsInNoteCatcherDat);
+  const [noteCatcherRepositoiningElemKey, setNoteCatcherRepositoiningElemKey] =
+    useState("");
+
   const addInput = (e) => {
     const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
     const formFieldCount = inputFieldsInNoteCatcherReplica.formFields.size;
-    inputFieldsInNoteCatcherReplica.formFields.add({
-      key: generateUUID(),
+
+    const elemKey = generateUUID();
+    inputFieldsInNoteCatcherReplica.formFields.set(elemKey, {
+      key: elemKey,
       type: "input",
       style: {
         width: "300px",
-        marginLeft: "100px",
+        left: "50px",
         top: `${formFieldCount * 100}px`,
       },
+      repositionElement: false,
     });
 
     setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
   };
+  const onMouseUpInNoteCatcher = (e: React.MouseEvent) => {
+    const newMousePositionY = `${e.clientY - 160}px`;
+    const newMousePositionX = `${e.clientX - 90}px`;
 
-  const onMouseMoveInNoteCatcher = (e: React.MouseEvent) => {
-    if (noteCatcherCurrentlyMovableField.current) {
-      console.log(e.clientX, e.clientY);
+    const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
+    const formFieldDataReplica = inputFieldsInNoteCatcherReplica.formFields.get(
+      noteCatcherRepositoiningElemKey,
+    );
 
-      noteCatcherCurrentlyMovableField.current.style.top = `${
-        e.clientY - 160
-      }px`;
-      noteCatcherCurrentlyMovableField.current.style.left = `${
-        e.clientX - 90
-      }px`;
+    if (formFieldDataReplica) {
+      formFieldDataReplica.repositionElement = false;
+      formFieldDataReplica.style.top = newMousePositionY;
+      formFieldDataReplica.style.left = newMousePositionX;
+      inputFieldsInNoteCatcherReplica.formFields.set(
+        noteCatcherRepositoiningElemKey,
+        formFieldDataReplica,
+      );
+
+      setNoteCatcherRepositoiningElemKey("");
+      setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
     }
+  };
+  const enableRepositionOnFormField = (elemKey: string) => {
+    setNoteCatcherRepositoiningElemKey(elemKey);
+
+    const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
+    const formFieldDataReplica =
+      inputFieldsInNoteCatcherReplica.formFields.get(elemKey);
+
+    if (formFieldDataReplica) {
+      formFieldDataReplica.repositionElement = true;
+      inputFieldsInNoteCatcherReplica.formFields.set(
+        elemKey,
+        formFieldDataReplica,
+      );
+    }
+
+    setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
+  };
+  const deleteNoteCatcherFormField = (elemKey: string) => {
+    const inputFieldsInNoteCatcherReplica = { ...inputFieldsInNoteCatcherData };
+    inputFieldsInNoteCatcherReplica.formFields.delete(elemKey);
+    setInputFieldsInNoteCatcherData(inputFieldsInNoteCatcherReplica);
   };
 
   const constructedformFieldComponents: JSX.Element[] = [];
-  const formFieldsArray = Array.from(inputFieldsInNoteCatcherData.formFields);
-  for (let i = 0; i < formFieldsArray.length; i++) {
-    const currentInputFieldData = formFieldsArray[i];
+  for (const [key, formFieldElem] of inputFieldsInNoteCatcherData.formFields) {
     constructedformFieldComponents.push(
       <NoteCatcherFormFieldForwarded
-        ref={noteCatcherCurrentlyMovableField}
-        key={currentInputFieldData.key}
-        data={currentInputFieldData}
-        enableDragOnFieldElement={enableDragOnFieldElement}
-        setEnableDragOnFieldElement={setEnableDragOnFieldElement}
+        key={formFieldElem.key}
+        data={formFieldElem}
+        enableRepositionOnFormField={enableRepositionOnFormField}
+        deleteNoteCatcherFormField={deleteNoteCatcherFormField}
       />,
     );
   }
@@ -106,11 +137,12 @@ export default function AddNote({}) {
 
       <main
         className={addNoteStyles["note-catcher"]}
-        onMouseMove={onMouseMoveInNoteCatcher}
+        onClick={onMouseUpInNoteCatcher}
       >
-        <p>{pageTitles.ADD_NOTE}</p>
         <section className={addNoteStyles["note-pad"]}>
-          {constructedformFieldComponents}
+          <section className={addNoteStyles["note-pad-overflow-content"]}>
+            {constructedformFieldComponents}
+          </section>
         </section>
         <Fab
           color="primary"
@@ -136,23 +168,18 @@ export default function AddNote({}) {
   );
 }
 
-// TODO: moke the below component a dragable
-// remove the ts ignore tag
 interface NoteCatcherFormFieldType {
   data: InputFieldInfo;
-  enableDragOnFieldElement: boolean;
-  setEnableDragOnFieldElement: Dispatch<SetStateAction<boolean>>;
+  enableRepositionOnFormField: (elemKey: string) => void;
+  deleteNoteCatcherFormField: (elemKey: string) => void;
 }
 
-const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
-  {
-    data,
-    enableDragOnFieldElement,
-    setEnableDragOnFieldElement,
-  }: NoteCatcherFormFieldType,
-  parentFormFieldRef,
-) {
-  const { key, style, type } = data;
+const NoteCatcherFormFieldForwarded = ({
+  data,
+  enableRepositionOnFormField,
+  deleteNoteCatcherFormField,
+}: NoteCatcherFormFieldType) => {
+  const { key, style, type, repositionElement } = data;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOnMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -163,11 +190,17 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
   };
 
   const dragNoteCatcherFormField = (e) => {
-    setEnableDragOnFieldElement(!enableDragOnFieldElement);
+    handleClose();
+    enableRepositionOnFormField(key);
   };
 
   const addRefNoteCatcherFormField = (e) => {
     handleClose();
+  };
+
+  const deleteNoteCatcherFormFieldChild = (e) => {
+    handleClose();
+    deleteNoteCatcherFormField(key);
   };
 
   const openMenu = Boolean(anchorEl);
@@ -176,12 +209,9 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
     case "input":
       return (
         <section
-          // TODO: fix the below ts ref type
-          // @ts-ignore:next-line
-          ref={enableDragOnFieldElement ? parentFormFieldRef : null}
           className={addNoteStyles["formfield-holder"]}
           style={{
-            marginLeft: style.marginLeft,
+            left: style.left,
             width: style.width,
             top: style.top,
           }}
@@ -195,15 +225,16 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
           >
             <MoreVertIcon />
           </Fab>
-          <Fab
-            className={addNoteStyles["move-field"]}
-            size="small"
-            color="primary"
-            aria-label="inputs move"
-            onClick={dragNoteCatcherFormField}
-          >
-            <SettingsEthernetIcon />
-          </Fab>
+          {repositionElement && (
+            <Fab
+              className={addNoteStyles["move-field"]}
+              size="small"
+              color="primary"
+              aria-label="inputs is moving"
+            >
+              <SettingsEthernetIcon />
+            </Fab>
+          )}
           <TextField
             label={`input-${key}`}
             multiline
@@ -218,7 +249,7 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
             open={openMenu}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose} disableRipple>
+            <MenuItem onClick={dragNoteCatcherFormField} disableRipple>
               <span
                 className={addNoteStyles["note-catcher-form-field-menu-icon"]}
               >
@@ -226,14 +257,22 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
               </span>
               Move
             </MenuItem>
-            <Divider sx={{ my: 0.5 }} />
             <MenuItem onClick={addRefNoteCatcherFormField} disableRipple>
               <span
                 className={addNoteStyles["note-catcher-form-field-menu-icon"]}
               >
-                <AddCardIcon />
+                <PlusIcon />
               </span>
-              Add More
+              Add Refs
+            </MenuItem>
+            <Divider sx={{ my: 0.5 }} />
+            <MenuItem onClick={deleteNoteCatcherFormFieldChild} disableRipple>
+              <span
+                className={addNoteStyles["note-catcher-form-field-menu-icon"]}
+              >
+                <DeleteIcon />
+              </span>
+              Delete
             </MenuItem>
           </Menu>
         </section>
@@ -244,7 +283,7 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
         <section
           className={addNoteStyles["formfield-holder"]}
           style={{
-            marginLeft: style.marginLeft,
+            left: style.left,
             width: style.width,
             top: style.top,
           }}
@@ -277,7 +316,7 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
               <span
                 className={addNoteStyles["note-catcher-form-field-menu-icon"]}
               >
-                <AddCardIcon />
+                <PlusIcon />
               </span>
               Add More
             </MenuItem>
@@ -285,4 +324,4 @@ const NoteCatcherFormFieldForwarded = forwardRef(function NoteCatcherFormField(
         </section>
       );
   }
-});
+};

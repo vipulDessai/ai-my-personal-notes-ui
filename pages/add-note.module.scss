@@ -7,17 +7,21 @@
   }
   .note-pad {
     position: relative;
-    .formfield-holder {
-      position: absolute;
-      .menu {
+    height: 100%;
+    overflow: auto;
+    .note-pad-overflow-content {
+      .formfield-holder {
         position: absolute;
-        right: 0;
-        transform: translateX(50%);
-      }
-      .move-field {
-        position: absolute;
-        left: 0;
-        transform: translateX(-50%);
+        .menu {
+          position: absolute;
+          right: 0;
+          transform: translateX(50%);
+        }
+        .move-field {
+          position: absolute;
+          left: 0;
+          transform: translateX(-50%);
+        }
       }
     }
   }
