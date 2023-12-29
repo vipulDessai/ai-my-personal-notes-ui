@@ -3,12 +3,15 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import PlusIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import SettingsEthernetIcon from "@mui/icons-material/SettingsEthernet";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DoneIcon from "@mui/icons-material/Done";
 /** Material UI Icons <END> */
 
@@ -25,11 +28,14 @@ export const iconComponents = {
   MailIcon,
   MenuIcon,
   PlusIcon,
+  RemoveIcon,
   MoreVertIcon,
   DragIndicatorIcon,
   SettingsEthernetIcon,
   DeleteIcon,
+  ArrowDropUpIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
+  ArrowDropDownIcon,
   DoneIcon,
 };

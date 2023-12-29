@@ -18,7 +18,7 @@ export default function Home() {
     defualtRetuarantnNamesValue,
   );
 
-  const makeApiCallTest = async (e) => {
+  const makeApiCallTest = async () => {
     dispatch(showLoader());
     try {
       const res = await getData(

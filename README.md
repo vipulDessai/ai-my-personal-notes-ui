@@ -17,6 +17,7 @@ My personal notes managing app powered by AI
 - should allow adding people, places (state, area etc) or links or whatever to the notes as refs
 - news that will complete in a future date
     - somehow tracker for the same
+- undo feature for deleting the input form fields in the note catcher
 
 # TODO
 - [x] Add redux

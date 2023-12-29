@@ -43,7 +43,7 @@ export function SidePanel() {
       <List>
         <ListItem disablePadding>
           <ListItemButton
-            onClick={(e) => {
+            onClick={() => {
               router.push("/");
             }}
           >
@@ -58,7 +58,7 @@ export function SidePanel() {
       <List>
         <ListItem disablePadding>
           <ListItemButton
-            onClick={(e) => {
+            onClick={() => {
               router.push("/add-note");
             }}
           >

@@ -17,38 +17,37 @@
           right: 0;
           transform: translateX(50%);
         }
-        .move-field {
+        .menu-option {
           position: absolute;
+        }
+        .move-field-done,
+        .resize-done,
+        .move-field-done {
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
         }
-        .resize-left {
-          position: absolute;
+        .resize-left,
+        .move-field-left {
           left: 0;
           top: 50%;
           transform: translate(-50%, -50%);
         }
-        .resize-right {
-          position: absolute;
+        .resize-right,
+        .move-field-right {
           right: 0;
           top: 50%;
           transform: translate(50%, -50%);
         }
-        .resize-done {
-          position: absolute;
+        .move-field-up {
+          top: 0;
           left: 50%;
-          top: 50%;
           transform: translate(-50%, -50%);
         }
-      }
-    }
-  }
-  &.reposition-form-fields-enabled {
-    .note-pad {
-      .note-pad-overflow-content {
-        .formfield-holder {
-          z-index: -1;
+        .move-field-down {
+          bottom: 0;
+          left: 50%;
+          transform: translate(-50%, 50%);
         }
       }
     }

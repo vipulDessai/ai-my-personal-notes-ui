@@ -6,7 +6,7 @@ import commonFeedback from "./common-feedback.module.scss";
 import { RootState } from "./stores";
 import { resetAlert } from "./stores/features/alert.slice";
 
-export const CommonFeedbackComponents = ({}) => {
+export const CommonFeedbackComponents = () => {
   const showLoader = useSelector((state: RootState) => state.loader);
   const alertData = useSelector((state: RootState) => state.alert);
 
@@ -29,7 +29,7 @@ export const CommonFeedbackComponents = ({}) => {
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={true}
-            onClick={(e) => {
+            onClick={() => {
               dispatch(resetAlert());
             }}
           >
