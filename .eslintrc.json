@@ -9,6 +9,7 @@
     // override configuration set by extending "eslint:recommended"
     "no-empty": "warn",
     "no-cond-assign": ["error", "always"],
+    "no-unused-vars": "warn",
 
     // disable rules from base configurations
     "for-direction": "off",
