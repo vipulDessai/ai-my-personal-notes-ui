@@ -15,7 +15,6 @@ import addNoteStyles from "./add-note.module.scss";
 
 import { Header, Footer } from "../components";
 import { generateUUID, iconComponents, pageTitles } from "../components/utils";
-import Image from "next/image";
 
 const {
   PlusIcon,
@@ -60,6 +59,8 @@ const FORM_FIELD_REPOSE_DIRECTION = {
 export default function AddNote() {
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
   const defaultNoteCatcherFormFieldHierachy: NoteCatcherFieldsHierarchy[] = [];
+
+  // TODO: use redux store for managing the formfields
   const [noteCatcherFormFieldHierachy, setNoteCatcherFormFieldHierachy] =
     useState(defaultNoteCatcherFormFieldHierachy);
 
@@ -81,13 +82,6 @@ export default function AddNote() {
     });
     setNoteCatcherFormFieldHierachy(noteCatcherFormFieldHierachyReplica);
   };
-  const deleteNoteCatcherFormField = (elemKey: string) => {
-    // TODO - delete key from noteCatcherFormFieldHierachyReplica
-    const noteCatcherFormFieldHierachyReplica = [
-      ...noteCatcherFormFieldHierachy,
-    ];
-    setNoteCatcherFormFieldHierachy(noteCatcherFormFieldHierachyReplica);
-  };
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const output: JSX.Element[] = [];
@@ -102,11 +96,7 @@ export default function AddNote() {
         const formField = noteCatcherFormFieldHierachy[formfieldKey];
 
         output.push(
-          <NoteCatcherFormField
-            key={formField.key}
-            data={formField.meta}
-            deleteNoteCatcherFormField={deleteNoteCatcherFormField}
-          />,
+          <NoteCatcherFormField key={formField.key} data={formField.meta} />,
         );
       }
     }
@@ -158,14 +148,9 @@ export default function AddNote() {
 
 interface NoteCatcherFormFieldType {
   data: InputFieldInfo;
-  // eslint-disable-next-line no-unused-vars
-  deleteNoteCatcherFormField: (elemKey: string) => void;
 }
 
-const NoteCatcherFormField = ({
-  data,
-  deleteNoteCatcherFormField,
-}: NoteCatcherFormFieldType) => {
+const NoteCatcherFormField = ({ data }: NoteCatcherFormFieldType) => {
   const { key, type, label, level } = data;
   const [repositionElement, setRepositionElement] = useState(false);
   const [resizeElement, setResizeElement] = useState(false);
@@ -224,7 +209,8 @@ const NoteCatcherFormField = ({
 
   const deleteNoteCatcherFormFieldChild = () => {
     handleClose();
-    deleteNoteCatcherFormField(key);
+
+    // TODO: use redux store for managing the formfields
   };
 
   const enableResizeOnFormFieldChild = () => {
@@ -416,6 +402,14 @@ const NoteCatcherFormField = ({
                 <DeleteIcon />
               </span>
               Delete
+            </MenuItem>
+            <MenuItem onClick={addRefNoteCatcherFormField} disableRipple>
+              <span
+                className={addNoteStyles["note-catcher-form-field-menu-icon"]}
+              >
+                <PlusIcon />
+              </span>
+              Add child input
             </MenuItem>
           </Menu>
         </section>
