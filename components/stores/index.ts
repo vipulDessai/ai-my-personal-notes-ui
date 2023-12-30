@@ -3,12 +3,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import { counterSliceReducer } from "./features/counter.slice";
 import { alertSliceReducer } from "./features/alert.slice";
 import { commonLoaderSliceReducer } from "./features/loader.slice";
+import { addNoteSliceReducer } from "./features/add-note.slice";
 
 export const globalStore = configureStore({
   reducer: {
     counter: counterSliceReducer,
     alert: alertSliceReducer,
     loader: commonLoaderSliceReducer,
+    addNote: addNoteSliceReducer,
   },
 });
 
@@ -31,3 +33,9 @@ export {
   resetAlert,
 } from "./features/alert.slice";
 export { showLoader, hideLoader } from "./features/loader.slice";
+export {
+  addNewField,
+  addFieldToParent,
+  removeField,
+  repositionField,
+} from "./features/add-note.slice";

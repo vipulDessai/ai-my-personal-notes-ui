@@ -9,12 +9,14 @@ import {
   MenuItem,
   Divider,
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 
 import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
 
 import { Header, Footer } from "../components";
-import { generateUUID, iconComponents, pageTitles } from "../components/utils";
+import { iconComponents, pageTitles } from "../components/utils";
+import { RootState, addNewField } from "../components/stores";
 
 const {
   PlusIcon,
@@ -30,21 +32,6 @@ const {
   DoneIcon,
 } = iconComponents;
 
-type InputTypes = "input" | "image" | "map";
-
-interface InputFieldInfo {
-  type: InputTypes;
-  label: string;
-  level: number;
-  key: string;
-}
-
-interface NoteCatcherFieldsHierarchy {
-  key: string;
-  meta: InputFieldInfo;
-  childFields: NoteCatcherFieldsHierarchy[];
-}
-
 const FORM_FIELD_RESIZE_DIRECTION = {
   INC: "+",
   DECREASE: "-",
@@ -57,35 +44,20 @@ const FORM_FIELD_REPOSE_DIRECTION = {
 };
 
 export default function AddNote() {
+  const dispatch = useDispatch();
+  const noteCatcherFormFieldHierachy = useSelector((state: RootState) => {
+    const foo = "bar";
+    return state.addNote.formFields;
+  });
+
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
-  const defaultNoteCatcherFormFieldHierachy: NoteCatcherFieldsHierarchy[] = [];
-
-  // TODO: use redux store for managing the formfields
-  const [noteCatcherFormFieldHierachy, setNoteCatcherFormFieldHierachy] =
-    useState(defaultNoteCatcherFormFieldHierachy);
-
-  const addInput = () => {
-    const noteCatcherFormFieldHierachyReplica = [
-      ...noteCatcherFormFieldHierachy,
-    ];
-    const elemKey = generateUUID();
-    noteCatcherFormFieldHierachyReplica.push({
-      key: elemKey,
-      // TODO - add label and level with proper value
-      meta: {
-        key: elemKey,
-        label: elemKey,
-        level: 0,
-        type: "input",
-      },
-      childFields: [],
-    });
-    setNoteCatcherFormFieldHierachy(noteCatcherFormFieldHierachyReplica);
-  };
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const output: JSX.Element[] = [];
 
+    const fieldsCount = noteCatcherFormFieldHierachy.length;
+
+    let c = 0;
     for (const formfieldKey in noteCatcherFormFieldHierachy) {
       if (
         Object.prototype.hasOwnProperty.call(
@@ -94,10 +66,22 @@ export default function AddNote() {
         )
       ) {
         const formField = noteCatcherFormFieldHierachy[formfieldKey];
+        const { type, label, level, key } = formField.meta;
 
         output.push(
-          <NoteCatcherFormField key={formField.key} data={formField.meta} />,
+          <NoteCatcherFormField
+            key={formField.key}
+            type={type}
+            label={label}
+            level={level}
+            elemKey={key}
+            // TODO: improvise the first and last node logic
+            firstNode={c == 0}
+            lastNode={c === fieldsCount - 1}
+          />,
         );
+
+        c++;
       }
     }
 
@@ -135,7 +119,11 @@ export default function AddNote() {
           open={showAddInputMenu}
           onClick={() => setShowAddInputMenu(false)}
         >
-          <Button color="secondary" variant="contained" onClick={addInput}>
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => dispatch(addNewField())}
+          >
             Input Box
           </Button>
         </Backdrop>
@@ -147,11 +135,22 @@ export default function AddNote() {
 }
 
 interface NoteCatcherFormFieldType {
-  data: InputFieldInfo;
+  elemKey: string;
+  type: string;
+  label: string;
+  level: number;
+  firstNode: boolean;
+  lastNode: boolean;
 }
 
-const NoteCatcherFormField = ({ data }: NoteCatcherFormFieldType) => {
-  const { key, type, label, level } = data;
+const NoteCatcherFormField = ({
+  elemKey,
+  type,
+  label,
+  level,
+  firstNode,
+  lastNode,
+}: NoteCatcherFormFieldType) => {
   const [repositionElement, setRepositionElement] = useState(false);
   const [resizeElement, setResizeElement] = useState(false);
   const [style, setStyle] = useState({
@@ -306,17 +305,21 @@ const NoteCatcherFormField = ({ data }: NoteCatcherFormFieldType) => {
               >
                 <DoneIcon />
               </Fab>
-              <Fab
-                className={`${addNoteStyles["move-field-up"]} ${addNoteStyles["menu-option"]}`}
-                size="small"
-                color="primary"
-                aria-label="inputs move up"
-                onClick={() =>
-                  repostionNoteCatcherFormField(FORM_FIELD_REPOSE_DIRECTION.UP)
-                }
-              >
-                <ArrowDropUpIcon />
-              </Fab>
+              {!firstNode && (
+                <Fab
+                  className={`${addNoteStyles["move-field-up"]} ${addNoteStyles["menu-option"]}`}
+                  size="small"
+                  color="primary"
+                  aria-label="inputs move up"
+                  onClick={() =>
+                    repostionNoteCatcherFormField(
+                      FORM_FIELD_REPOSE_DIRECTION.UP,
+                    )
+                  }
+                >
+                  <ArrowDropUpIcon />
+                </Fab>
+              )}
               <Fab
                 className={`${addNoteStyles["move-field-left"]} ${addNoteStyles["menu-option"]}`}
                 size="small"
@@ -343,19 +346,21 @@ const NoteCatcherFormField = ({ data }: NoteCatcherFormFieldType) => {
               >
                 <ArrowRightIcon />
               </Fab>
-              <Fab
-                className={`${addNoteStyles["move-field-down"]} ${addNoteStyles["menu-option"]}`}
-                size="small"
-                color="primary"
-                aria-label="inputs move down"
-                onClick={() =>
-                  repostionNoteCatcherFormField(
-                    FORM_FIELD_REPOSE_DIRECTION.DOWN,
-                  )
-                }
-              >
-                <ArrowDropDownIcon />
-              </Fab>
+              {!lastNode && (
+                <Fab
+                  className={`${addNoteStyles["move-field-down"]} ${addNoteStyles["menu-option"]}`}
+                  size="small"
+                  color="primary"
+                  aria-label="inputs move down"
+                  onClick={() =>
+                    repostionNoteCatcherFormField(
+                      FORM_FIELD_REPOSE_DIRECTION.DOWN,
+                    )
+                  }
+                >
+                  <ArrowDropDownIcon />
+                </Fab>
+              )}
             </>
           )}
           <TextField label={label} margin="normal" multiline fullWidth />
