@@ -16,7 +16,12 @@ import addNoteStyles from "./add-note.module.scss";
 
 import { Header, Footer } from "../components";
 import { iconComponents, pageTitles } from "../components/utils";
-import { RootState, addNewField } from "../components/stores";
+import {
+  RootState,
+  addFieldToParent,
+  addNewField,
+  removeField,
+} from "../components/stores";
 
 const {
   PlusIcon,
@@ -45,45 +50,48 @@ const FORM_FIELD_REPOSE_DIRECTION = {
 
 export default function AddNote() {
   const dispatch = useDispatch();
-  const noteCatcherFormFieldHierachy = useSelector((state: RootState) => {
-    const foo = "bar";
-    return state.addNote.formFields;
-  });
+  const noteCatcherFormFieldHierachy = useSelector(
+    (state: RootState) => state.addNote.formFields,
+  );
 
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
-    const output: JSX.Element[] = [];
+    const internalRecurringSrchFormElem = (
+      curFormFields: ReturnType<() => typeof noteCatcherFormFieldHierachy>,
+    ) => {
+      const curOut: JSX.Element[] = [];
+      for (let i = 0; i < curFormFields.length; i++) {
+        const formField = curFormFields[i];
 
-    const fieldsCount = noteCatcherFormFieldHierachy.length;
+        // the formField is null if that node is deleted from redux slice
+        if (formField) {
+          const { type, label, level, key } = formField.meta;
 
-    let c = 0;
-    for (const formfieldKey in noteCatcherFormFieldHierachy) {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          noteCatcherFormFieldHierachy,
-          formfieldKey,
-        )
-      ) {
-        const formField = noteCatcherFormFieldHierachy[formfieldKey];
-        const { type, label, level, key } = formField.meta;
+          const childNodes = internalRecurringSrchFormElem(
+            formField.childFields,
+          );
 
-        output.push(
-          <NoteCatcherFormField
-            key={formField.key}
-            type={type}
-            label={label}
-            level={level}
-            elemKey={key}
-            // TODO: improvise the first and last node logic
-            firstNode={c == 0}
-            lastNode={c === fieldsCount - 1}
-          />,
-        );
-
-        c++;
+          curOut.push(
+            <NoteCatcherFormField
+              key={key}
+              type={type}
+              label={label}
+              level={level}
+              elemKey={key}
+              // TODO: improvise the first and last node logic
+              firstNode={false}
+              lastNode={false}
+              childNodes={childNodes}
+            />,
+          );
+        }
       }
-    }
+
+      return curOut;
+    };
+
+    const output = internalRecurringSrchFormElem(noteCatcherFormFieldHierachy);
 
     return output;
   };
@@ -141,6 +149,7 @@ interface NoteCatcherFormFieldType {
   level: number;
   firstNode: boolean;
   lastNode: boolean;
+  childNodes: JSX.Element[];
 }
 
 const NoteCatcherFormField = ({
@@ -150,7 +159,10 @@ const NoteCatcherFormField = ({
   level,
   firstNode,
   lastNode,
+  childNodes,
 }: NoteCatcherFormFieldType) => {
+  const dispatch = useDispatch();
+
   const [repositionElement, setRepositionElement] = useState(false);
   const [resizeElement, setResizeElement] = useState(false);
   const [style, setStyle] = useState({
@@ -208,8 +220,7 @@ const NoteCatcherFormField = ({
 
   const deleteNoteCatcherFormFieldChild = () => {
     handleClose();
-
-    // TODO: use redux store for managing the formfields
+    dispatch(removeField({ elemKey }));
   };
 
   const enableResizeOnFormFieldChild = () => {
@@ -230,6 +241,11 @@ const NoteCatcherFormField = ({
   const disableResizeOnFormFieldChild = () => {
     handleClose();
     setResizeElement(false);
+  };
+
+  const addChildElemToThisFormField = () => {
+    handleClose();
+    dispatch(addFieldToParent({ parentId: elemKey }));
   };
 
   const openMenu = Boolean(anchorEl);
@@ -364,6 +380,7 @@ const NoteCatcherFormField = ({
             </>
           )}
           <TextField label={label} margin="normal" multiline fullWidth />
+          {childNodes}
           <Menu
             MenuListProps={{
               "aria-labelledby": "demo-customized-button",
@@ -408,7 +425,7 @@ const NoteCatcherFormField = ({
               </span>
               Delete
             </MenuItem>
-            <MenuItem onClick={addRefNoteCatcherFormField} disableRipple>
+            <MenuItem onClick={addChildElemToThisFormField} disableRipple>
               <span
                 className={addNoteStyles["note-catcher-form-field-menu-icon"]}
               >
