@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { generateUUID } from "../../utils";
+import { FORM_FIELD_REPOSE_DIRECTION, generateUUID } from "../../utils";
 
 export interface InputFieldInfo {
   type: string;
   label: string;
   level: number;
   key: string;
+  repositionElement: boolean;
+  resizeElement: boolean;
 }
 
 interface NoteCatcherFieldsHierarchy {
@@ -39,6 +41,8 @@ export const addNoteSlice = createSlice({
           label: elemKey,
           level: 0,
           type: "input",
+          repositionElement: false,
+          resizeElement: false,
         },
         childFields: [],
       };
@@ -50,8 +54,13 @@ export const addNoteSlice = createSlice({
 
       findElemAndPerformOperation(
         parentId,
+        null,
         state.formFields,
-        (elem: NoteCatcherFieldsHierarchy[], index: number) => {
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          elem: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
           const noteCatcherField: NoteCatcherFieldsHierarchy = {
             key: childElemKey,
             // TODO - add label and level with proper value
@@ -60,6 +69,8 @@ export const addNoteSlice = createSlice({
               label: childElemKey,
               level: 0,
               type: "input",
+              repositionElement: false,
+              resizeElement: false,
             },
             childFields: [],
           };
@@ -71,8 +82,13 @@ export const addNoteSlice = createSlice({
     removeField: (state, action: PayloadAction<{ elemKey: string }>) => {
       findElemAndPerformOperation(
         action.payload.elemKey,
+        null,
         state.formFields,
-        (elem: NoteCatcherFieldsHierarchy[], index: number) => {
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          elem: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
           // TODO: see why a null is added when deleting the node
           delete elem[index];
         },
@@ -80,18 +96,115 @@ export const addNoteSlice = createSlice({
     },
     repositionField: (
       state,
-      action: PayloadAction<{ parentId: string; newFieldId: string }>,
-    ) => {},
+      action: PayloadAction<{ elemKey: string; direction: string }>,
+    ) => {
+      findElemAndPerformOperation(
+        action.payload.elemKey,
+        null,
+        state.formFields,
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          elem: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
+          switch (action.payload.direction) {
+            case FORM_FIELD_REPOSE_DIRECTION.UP:
+              break;
+
+            case FORM_FIELD_REPOSE_DIRECTION.LEFT:
+              {
+                if (parentField) {
+                  const tmpCurElem = { ...elem[index] };
+                  parentField.push(tmpCurElem);
+                  delete elem[index];
+                }
+              }
+
+              break;
+
+            case FORM_FIELD_REPOSE_DIRECTION.RIGHT:
+              {
+                const tmpCurElem = { ...elem[index] };
+                const tmpCurElemRef = index;
+
+                // try to select the upper sibling node
+                index--;
+                while (index >= 0) {
+                  // check if any upper node is NOT null
+                  if (elem[index]) {
+                    elem[index].childFields.push(tmpCurElem);
+                    delete elem[tmpCurElemRef];
+
+                    break;
+                  }
+
+                  index--;
+                }
+              }
+
+              break;
+
+            case FORM_FIELD_REPOSE_DIRECTION.DOWN:
+              break;
+
+            default:
+              break;
+          }
+        },
+      );
+    },
+    setRepositionElement: (
+      state,
+      action: PayloadAction<{ elemKey: string; value: boolean }>,
+    ) => {
+      findElemAndPerformOperation(
+        action.payload.elemKey,
+        null,
+        state.formFields,
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          elem: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
+          elem[index].meta.repositionElement = action.payload.value;
+        },
+      );
+    },
+    setResizeElement: (
+      state,
+      action: PayloadAction<{ elemKey: string; value: boolean }>,
+    ) => {
+      findElemAndPerformOperation(
+        action.payload.elemKey,
+        null,
+        state.formFields,
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          elem: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
+          elem[index].meta.resizeElement = action.payload.value;
+        },
+      );
+    },
   },
 });
 
-export const { addNewField, addFieldToParent, removeField, repositionField } =
-  addNoteSlice.actions;
+export const {
+  addNewField,
+  addFieldToParent,
+  removeField,
+  repositionField,
+  setRepositionElement,
+  setResizeElement,
+} = addNoteSlice.actions;
 
 export const addNoteSliceReducer = addNoteSlice.reducer;
 
+// TODO: prevFormFields always points to the root element
 const findElemAndPerformOperation = (
   key: string,
+  prevFormFields: NoteCatcherFieldsHierarchy[] | null,
   formFields: NoteCatcherFieldsHierarchy[],
   cb: any,
 ) => {
@@ -100,11 +213,11 @@ const findElemAndPerformOperation = (
 
     if (elem) {
       if (elem.key === key) {
-        cb(formFields, i);
+        cb(prevFormFields, formFields, i);
         return;
       }
 
-      findElemAndPerformOperation(key, elem.childFields, cb);
+      findElemAndPerformOperation(key, formFields, elem.childFields, cb);
     }
   }
 };

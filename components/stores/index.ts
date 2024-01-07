@@ -38,4 +38,6 @@ export {
   addFieldToParent,
   removeField,
   repositionField,
+  setRepositionElement,
+  setResizeElement,
 } from "./features/add-note.slice";

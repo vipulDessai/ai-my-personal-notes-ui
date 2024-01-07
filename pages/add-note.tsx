@@ -15,12 +15,20 @@ import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
 
 import { Header, Footer } from "../components";
-import { iconComponents, pageTitles } from "../components/utils";
+import {
+  FORM_FIELD_REPOSE_DIRECTION,
+  FORM_FIELD_RESIZE_DIRECTION,
+  iconComponents,
+  pageTitles,
+} from "../components/utils";
 import {
   RootState,
   addFieldToParent,
   addNewField,
   removeField,
+  repositionField,
+  setRepositionElement,
+  setResizeElement,
 } from "../components/stores";
 
 const {
@@ -36,17 +44,6 @@ const {
   ArrowDropDownIcon,
   DoneIcon,
 } = iconComponents;
-
-const FORM_FIELD_RESIZE_DIRECTION = {
-  INC: "+",
-  DECREASE: "-",
-};
-const FORM_FIELD_REPOSE_DIRECTION = {
-  UP: "up",
-  DOWN: "down",
-  LEFT: "l",
-  RIGHT: "r",
-};
 
 export default function AddNote() {
   const dispatch = useDispatch();
@@ -67,7 +64,8 @@ export default function AddNote() {
 
         // the formField is null if that node is deleted from redux slice
         if (formField) {
-          const { type, label, level, key } = formField.meta;
+          const { type, label, level, key, repositionElement, resizeElement } =
+            formField.meta;
 
           const childNodes = internalRecurringSrchFormElem(
             formField.childFields,
@@ -86,6 +84,8 @@ export default function AddNote() {
               lastNode={false}
               childNodes={childNodes}
               isRootElem={isRootElem}
+              repositionElement={repositionElement}
+              resizeElement={resizeElement}
             />,
           );
         }
@@ -156,6 +156,8 @@ interface NoteCatcherFormFieldType {
   firstNode: boolean;
   lastNode: boolean;
   isRootElem: boolean;
+  repositionElement: boolean;
+  resizeElement: boolean;
   childNodes: JSX.Element[];
 }
 
@@ -168,11 +170,11 @@ const NoteCatcherFormField = ({
   lastNode,
   childNodes,
   isRootElem,
+  repositionElement,
+  resizeElement,
 }: NoteCatcherFormFieldType) => {
   const dispatch = useDispatch();
 
-  const [repositionElement, setRepositionElement] = useState(false);
-  const [resizeElement, setResizeElement] = useState(false);
   const [style, setStyle] = useState({
     left: 50,
     width: 300,
@@ -189,37 +191,14 @@ const NoteCatcherFormField = ({
 
   const enableRepositionNoteCatcherFormField = () => {
     handleClose();
-    setRepositionElement(true);
+    dispatch(setRepositionElement({ elemKey, value: true }));
   };
   const repostionNoteCatcherFormField = (direction: string) => {
-    const styleReplica = { ...style };
-
-    switch (direction) {
-      case FORM_FIELD_REPOSE_DIRECTION.UP:
-        styleReplica.left += 50;
-        break;
-
-      case FORM_FIELD_REPOSE_DIRECTION.LEFT:
-        styleReplica.left -= 50;
-        break;
-
-      case FORM_FIELD_REPOSE_DIRECTION.RIGHT:
-        styleReplica.left += 50;
-        break;
-
-      case FORM_FIELD_REPOSE_DIRECTION.DOWN:
-        styleReplica.left -= 50;
-        break;
-
-      default:
-        break;
-    }
-
-    setStyle(styleReplica);
+    dispatch(repositionField({ elemKey, direction }));
   };
   const disableRepositionNoteCatcherFormField = () => {
     handleClose();
-    setRepositionElement(false);
+    dispatch(setRepositionElement({ elemKey, value: false }));
   };
 
   const addRefNoteCatcherFormField = () => {
@@ -233,7 +212,7 @@ const NoteCatcherFormField = ({
 
   const enableResizeOnFormFieldChild = () => {
     handleClose();
-    setResizeElement(true);
+    dispatch(setResizeElement({ elemKey, value: true }));
   };
   const performResizeOnFormFieldChild = (direction: string) => {
     handleClose();
@@ -248,7 +227,7 @@ const NoteCatcherFormField = ({
   };
   const disableResizeOnFormFieldChild = () => {
     handleClose();
-    setResizeElement(false);
+    dispatch(setResizeElement({ elemKey, value: false }));
   };
 
   const addChildElemToThisFormField = () => {
