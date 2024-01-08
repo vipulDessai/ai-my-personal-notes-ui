@@ -7,10 +7,9 @@ import { RootState } from "./stores";
 import { resetAlert } from "./stores/features/alert.slice";
 
 export const CommonFeedbackComponents = () => {
+  const dispatch = useDispatch();
   const showLoader = useSelector((state: RootState) => state.loader);
   const alertData = useSelector((state: RootState) => state.alert);
-
-  const dispatch = useDispatch();
 
   return (
     <>
