@@ -6,7 +6,7 @@ import { useSelector } from "../__mocks__/react-redux";
 
 describe("Add Note", () => {
   it("renders the add note page", () => {
-    useSelector.mockImplementation(() => []);
+    useSelector.mockImplementation(() => ({ formFields: [] }));
 
     render(<AddNote />);
 

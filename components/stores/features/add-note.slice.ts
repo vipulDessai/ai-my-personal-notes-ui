@@ -5,8 +5,6 @@ import { FORM_FIELD_REPOSE_DIRECTION, generateUUID } from "../../utils";
 
 export interface InputFieldInfo {
   type: string;
-  label: string;
-  level: number;
   key: string;
   repositionElement: boolean;
   resizeElement: boolean;
@@ -18,11 +16,23 @@ interface NoteCatcherFieldsHierarchy {
   childFields: NoteCatcherFieldsHierarchy[];
 }
 
+export interface InputModifyInfoType {
+  inProgress: boolean;
+  elemKey: string;
+  actionType: "" | "resize" | "reposition";
+}
+
 interface AddNoteState {
+  inputModifyInfo: InputModifyInfoType;
   formFields: NoteCatcherFieldsHierarchy[];
 }
 
 const initialState: AddNoteState = {
+  inputModifyInfo: {
+    inProgress: false,
+    elemKey: "",
+    actionType: "",
+  },
   formFields: [],
 };
 
@@ -35,11 +45,8 @@ export const addNoteSlice = createSlice({
 
       const noteCatcherField: NoteCatcherFieldsHierarchy = {
         key: elemKey,
-        // TODO - add label and level with proper value
         meta: {
           key: elemKey,
-          label: elemKey,
-          level: 0,
           type: "input",
           repositionElement: false,
           resizeElement: false,
@@ -63,11 +70,8 @@ export const addNoteSlice = createSlice({
         ) => {
           const noteCatcherField: NoteCatcherFieldsHierarchy = {
             key: childElemKey,
-            // TODO - add label and level with proper value
             meta: {
               key: childElemKey,
-              label: childElemKey,
-              level: 0,
               type: "input",
               repositionElement: false,
               resizeElement: false,
@@ -98,8 +102,9 @@ export const addNoteSlice = createSlice({
       state,
       action: PayloadAction<{ elemKey: string; direction: string }>,
     ) => {
+      const { elemKey, direction } = action.payload;
       findElemAndPerformOperation(
-        action.payload.elemKey,
+        elemKey,
         null,
         state.formFields,
         (
@@ -107,7 +112,7 @@ export const addNoteSlice = createSlice({
           elem: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          switch (action.payload.direction) {
+          switch (direction) {
             case FORM_FIELD_REPOSE_DIRECTION.UP:
               break;
 
@@ -157,8 +162,16 @@ export const addNoteSlice = createSlice({
       state,
       action: PayloadAction<{ elemKey: string; value: boolean }>,
     ) => {
+      const { elemKey, value } = action.payload;
+
+      state.inputModifyInfo = {
+        inProgress: value,
+        elemKey: value ? elemKey : "",
+        actionType: value ? "reposition" : "",
+      };
+
       findElemAndPerformOperation(
-        action.payload.elemKey,
+        elemKey,
         null,
         state.formFields,
         (
@@ -166,7 +179,7 @@ export const addNoteSlice = createSlice({
           elem: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          elem[index].meta.repositionElement = action.payload.value;
+          elem[index].meta.repositionElement = value;
         },
       );
     },
@@ -174,8 +187,16 @@ export const addNoteSlice = createSlice({
       state,
       action: PayloadAction<{ elemKey: string; value: boolean }>,
     ) => {
+      const { elemKey, value } = action.payload;
+
+      state.inputModifyInfo = {
+        inProgress: value,
+        elemKey: value ? elemKey : "",
+        actionType: value ? "resize" : "",
+      };
+
       findElemAndPerformOperation(
-        action.payload.elemKey,
+        elemKey,
         null,
         state.formFields,
         (
@@ -183,7 +204,7 @@ export const addNoteSlice = createSlice({
           elem: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          elem[index].meta.resizeElement = action.payload.value;
+          elem[index].meta.resizeElement = value;
         },
       );
     },

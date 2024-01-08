@@ -34,3 +34,8 @@ My personal notes managing app powered by AI
 - [ ] git workflows - fix "act(...) is not supported in production builds of React."
 - [ ] learn more about material UI theme 
     - import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+
+# linter
+```ts
+// eslint-disable-next-line no-unused-vars
+```

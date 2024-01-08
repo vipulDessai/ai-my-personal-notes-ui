@@ -25,6 +25,7 @@ export const globalStore = configureStore({
     loader: commonLoaderSliceReducer,
     addNote: persistedAddNoteSliceReducer,
   },
+  // eslint-disable-next-line no-unused-vars
   middleware: (getDefaultMiddleware) => {
     return new Tuple(thunk);
   },
@@ -58,4 +59,5 @@ export {
   repositionField,
   setRepositionElement,
   setResizeElement,
+  type InputModifyInfoType,
 } from "./features/add-note.slice";

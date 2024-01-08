@@ -15,8 +15,7 @@ it("renders homepage unchanged", () => {
 });
 
 it("renders add note unchanged", () => {
-  // TODO: remove this meaning less mocker test 😁
-  useSelector.mockImplementation(() => []);
+  useSelector.mockImplementation(() => ({ formFields: [] }));
 
   const { container } = render(<AddNote />);
   expect(container).toMatchSnapshot();

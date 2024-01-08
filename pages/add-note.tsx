@@ -22,6 +22,7 @@ import {
   pageTitles,
 } from "../components/utils";
 import {
+  InputModifyInfoType,
   RootState,
   addFieldToParent,
   addNewField,
@@ -47,16 +48,15 @@ const {
 
 export default function AddNote() {
   const dispatch = useDispatch();
-  const noteCatcherFormFieldHierachy = useSelector(
-    (state: RootState) => state.addNote.formFields,
-  );
+  const addNoteStoreState = useSelector((state: RootState) => state.addNote);
 
   const [showAddInputMenu, setShowAddInputMenu] = useState(false);
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
-      curFormFields: ReturnType<() => typeof noteCatcherFormFieldHierachy>,
+      curFormFields: ReturnType<() => typeof addNoteStoreState.formFields>,
       isRootElem: boolean,
+      curLabelPrefix: string,
     ) => {
       const curOut: JSX.Element[] = [];
       for (let i = 0; i < curFormFields.length; i++) {
@@ -64,28 +64,34 @@ export default function AddNote() {
 
         // the formField is null if that node is deleted from redux slice
         if (formField) {
-          const { type, label, level, key, repositionElement, resizeElement } =
+          const { type, key, repositionElement, resizeElement } =
             formField.meta;
 
           const childNodes = internalRecurringSrchFormElem(
             formField.childFields,
             false,
+            `${curLabelPrefix}${i + 1}.`,
           );
+
+          // TODO: in case there are null in the array
+          // the firstnode is not always 0
+          const firstNode = isRootElem && i === 0;
+          const lastNode = isRootElem && i === curFormFields.length - 1;
 
           curOut.push(
             <NoteCatcherFormField
               key={key}
               type={type}
-              label={label}
-              level={level}
+              label={`${curLabelPrefix}${i + 1}`}
               elemKey={key}
               // TODO: improvise the first and last node logic
-              firstNode={false}
-              lastNode={false}
+              firstNode={firstNode}
+              lastNode={lastNode}
               childNodes={childNodes}
               isRootElem={isRootElem}
               repositionElement={repositionElement}
               resizeElement={resizeElement}
+              siblingInputModifyInfo={addNoteStoreState.inputModifyInfo}
             />,
           );
         }
@@ -95,8 +101,9 @@ export default function AddNote() {
     };
 
     const output = internalRecurringSrchFormElem(
-      noteCatcherFormFieldHierachy,
+      addNoteStoreState.formFields,
       true,
+      "",
     );
 
     return output;
@@ -152,12 +159,12 @@ interface NoteCatcherFormFieldType {
   elemKey: string;
   type: string;
   label: string;
-  level: number;
   firstNode: boolean;
   lastNode: boolean;
   isRootElem: boolean;
   repositionElement: boolean;
   resizeElement: boolean;
+  siblingInputModifyInfo: InputModifyInfoType;
   childNodes: JSX.Element[];
 }
 
@@ -165,13 +172,13 @@ const NoteCatcherFormField = ({
   elemKey,
   type,
   label,
-  level,
   firstNode,
   lastNode,
   childNodes,
   isRootElem,
   repositionElement,
   resizeElement,
+  siblingInputModifyInfo,
 }: NoteCatcherFormFieldType) => {
   const dispatch = useDispatch();
 
@@ -225,6 +232,25 @@ const NoteCatcherFormField = ({
     }
     setStyle(styleReplica);
   };
+  const siblingReadyForModificationOnClick = () => {
+    if (siblingInputModifyInfo.actionType === "reposition") {
+      dispatch(
+        setRepositionElement({
+          elemKey: siblingInputModifyInfo.elemKey,
+          value: false,
+        }),
+      );
+      dispatch(setRepositionElement({ elemKey, value: true }));
+    } else {
+      dispatch(
+        setResizeElement({
+          elemKey: siblingInputModifyInfo.elemKey,
+          value: false,
+        }),
+      );
+      dispatch(setResizeElement({ elemKey, value: true }));
+    }
+  };
   const disableResizeOnFormFieldChild = () => {
     handleClose();
     dispatch(setResizeElement({ elemKey, value: false }));
@@ -247,17 +273,19 @@ const NoteCatcherFormField = ({
           }}
         >
           <section className={addNoteStyles["text-field-container"]}>
-            {!resizeElement && !repositionElement && (
-              <Fab
-                className={addNoteStyles["menu"]}
-                size="small"
-                color="primary"
-                aria-label="inputs options"
-                onClick={handleOnMenuClick}
-              >
-                <MoreVertIcon />
-              </Fab>
-            )}
+            {!siblingInputModifyInfo.inProgress &&
+              !resizeElement &&
+              !repositionElement && (
+                <Fab
+                  className={addNoteStyles["menu"]}
+                  size="small"
+                  color="primary"
+                  aria-label="inputs options"
+                  onClick={handleOnMenuClick}
+                >
+                  <MoreVertIcon />
+                </Fab>
+              )}
             {resizeElement && (
               <>
                 <Fab
@@ -376,6 +404,14 @@ const NoteCatcherFormField = ({
             {(resizeElement || repositionElement) && (
               <section className={addNoteStyles["highlight-mask"]}></section>
             )}
+            {!resizeElement &&
+              !repositionElement &&
+              siblingInputModifyInfo.inProgress && (
+                <section
+                  className={`${addNoteStyles["highlight-mask"]} ${addNoteStyles["ready-for-modification"]}`}
+                  onClick={siblingReadyForModificationOnClick}
+                ></section>
+              )}
           </section>
           {childNodes}
           <Menu
