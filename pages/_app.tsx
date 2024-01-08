@@ -1,4 +1,5 @@
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 // dependency for material ui plugin
 import "@fontsource/roboto/300.css";
@@ -8,14 +9,16 @@ import "@fontsource/roboto/700.css";
 
 import "../styles/global.scss";
 
-import { globalStore } from "../components/stores";
+import { globalStore, persistedGlobalStore } from "../components/stores";
 import { CommonFeedbackComponents } from "../components";
 
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={globalStore}>
-      <Component {...pageProps} />
-      <CommonFeedbackComponents />
+      <PersistGate loading={null} persistor={persistedGlobalStore}>
+        <Component {...pageProps} />
+        <CommonFeedbackComponents />
+      </PersistGate>
     </Provider>
   );
 }
