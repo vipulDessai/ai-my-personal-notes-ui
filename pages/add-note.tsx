@@ -76,6 +76,9 @@ export default function AddNote() {
           // TODO: in case there are null in the array
           // the firstnode is not always 0
           const firstNode = isRootElem && i === 0;
+
+          // TODO: if the last node has any child element then the last child should be marked
+          // as the last node and not its parent
           const lastNode = isRootElem && i === curFormFields.length - 1;
 
           curOut.push(

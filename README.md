@@ -34,6 +34,7 @@ My personal notes managing app powered by AI
 - [ ] git workflows - fix "act(...) is not supported in production builds of React."
 - [ ] learn more about material UI theme 
     - import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+- [ ] - see why the build/compile in next js is not showing bad TS errors
 
 # linter
 ```ts

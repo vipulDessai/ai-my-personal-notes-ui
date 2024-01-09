@@ -65,7 +65,7 @@ export const addNoteSlice = createSlice({
         state.formFields,
         (
           parentField: NoteCatcherFieldsHierarchy[],
-          elem: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
           const noteCatcherField: NoteCatcherFieldsHierarchy = {
@@ -79,7 +79,7 @@ export const addNoteSlice = createSlice({
             childFields: [],
           };
 
-          elem[index].childFields.push(noteCatcherField);
+          currentFormFieldsList[index].childFields.push(noteCatcherField);
         },
       );
     },
@@ -90,11 +90,10 @@ export const addNoteSlice = createSlice({
         state.formFields,
         (
           parentField: NoteCatcherFieldsHierarchy[],
-          elem: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          // TODO: see why a null is added when deleting the node
-          delete elem[index];
+          currentFormFieldsList.splice(index, 1);
         },
       );
     },
@@ -109,19 +108,37 @@ export const addNoteSlice = createSlice({
         state.formFields,
         (
           parentField: NoteCatcherFieldsHierarchy[],
-          elem: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
           switch (direction) {
             case FORM_FIELD_REPOSE_DIRECTION.UP:
+              {
+                const tmpCurElemIndex = index;
+
+                index--;
+                do {
+                  if (currentFormFieldsList[index]) {
+                    const tmpCurElem = currentFormFieldsList.splice(
+                      tmpCurElemIndex,
+                      1,
+                    );
+
+                    currentFormFieldsList.splice(index, 0, tmpCurElem[0]);
+                    break;
+                  }
+
+                  index--;
+                } while (index >= 0);
+              }
+
               break;
 
             case FORM_FIELD_REPOSE_DIRECTION.LEFT:
               {
                 if (parentField) {
-                  const tmpCurElem = { ...elem[index] };
-                  parentField.push(tmpCurElem);
-                  delete elem[index];
+                  const tmpCurElem = currentFormFieldsList.splice(index, 1);
+                  parentField.push(tmpCurElem[0]);
                 }
               }
 
@@ -129,16 +146,16 @@ export const addNoteSlice = createSlice({
 
             case FORM_FIELD_REPOSE_DIRECTION.RIGHT:
               {
-                const tmpCurElem = { ...elem[index] };
-                const tmpCurElemRef = index;
-
                 // try to select the upper sibling node
                 index--;
                 while (index >= 0) {
                   // check if any upper node is NOT null
-                  if (elem[index]) {
-                    elem[index].childFields.push(tmpCurElem);
-                    delete elem[tmpCurElemRef];
+                  if (currentFormFieldsList[index]) {
+                    const tmpCurElem = currentFormFieldsList.splice(index, 1);
+
+                    currentFormFieldsList[index].childFields.push(
+                      tmpCurElem[0],
+                    );
 
                     break;
                   }
@@ -150,6 +167,25 @@ export const addNoteSlice = createSlice({
               break;
 
             case FORM_FIELD_REPOSE_DIRECTION.DOWN:
+              {
+                const tmpCurElemIndex = index;
+
+                index++;
+                do {
+                  if (currentFormFieldsList[index]) {
+                    const tmpCurElem = currentFormFieldsList.splice(
+                      tmpCurElemIndex,
+                      1,
+                    );
+
+                    currentFormFieldsList.splice(index, 0, tmpCurElem[0]);
+                    break;
+                  }
+
+                  index++;
+                } while (index <= currentFormFieldsList.length - 1);
+              }
+
               break;
 
             default:
@@ -176,10 +212,10 @@ export const addNoteSlice = createSlice({
         state.formFields,
         (
           parentField: NoteCatcherFieldsHierarchy[],
-          elem: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          elem[index].meta.repositionElement = value;
+          currentFormFieldsList[index].meta.repositionElement = value;
         },
       );
     },
@@ -201,10 +237,10 @@ export const addNoteSlice = createSlice({
         state.formFields,
         (
           parentField: NoteCatcherFieldsHierarchy[],
-          elem: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          elem[index].meta.resizeElement = value;
+          currentFormFieldsList[index].meta.resizeElement = value;
         },
       );
     },
