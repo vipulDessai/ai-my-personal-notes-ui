@@ -60,6 +60,11 @@ export default function AddNote() {
     ) => {
       const curOut: JSX.Element[] = [];
       for (let i = 0; i < curFormFields.length; i++) {
+        const firstNode = isRootElem && i === 0;
+        // TODO: if the last node has any child element then the last child should be marked
+        // as the last node and not its parent
+        const lastRootNode = isRootElem && i === curFormFields.length - 1;
+
         const formField = curFormFields[i];
 
         // the formField is null if that node is deleted from redux slice
@@ -73,14 +78,6 @@ export default function AddNote() {
             `${curLabelPrefix}${i + 1}.`,
           );
 
-          // TODO: in case there are null in the array
-          // the firstnode is not always 0
-          const firstNode = isRootElem && i === 0;
-
-          // TODO: if the last node has any child element then the last child should be marked
-          // as the last node and not its parent
-          const lastNode = isRootElem && i === curFormFields.length - 1;
-
           curOut.push(
             <NoteCatcherFormField
               key={key}
@@ -89,9 +86,8 @@ export default function AddNote() {
               elemKey={key}
               // TODO: improvise the first and last node logic
               firstNode={firstNode}
-              lastNode={lastNode}
+              lastNode={false}
               childNodes={childNodes}
-              isRootElem={isRootElem}
               repositionElement={repositionElement}
               resizeElement={resizeElement}
               siblingInputModifyInfo={addNoteStoreState.inputModifyInfo}
@@ -164,7 +160,6 @@ interface NoteCatcherFormFieldType {
   label: string;
   firstNode: boolean;
   lastNode: boolean;
-  isRootElem: boolean;
   repositionElement: boolean;
   resizeElement: boolean;
   siblingInputModifyInfo: InputModifyInfoType;
@@ -178,7 +173,6 @@ const NoteCatcherFormField = ({
   firstNode,
   lastNode,
   childNodes,
-  isRootElem,
   repositionElement,
   resizeElement,
   siblingInputModifyInfo,
@@ -433,19 +427,17 @@ const NoteCatcherFormField = ({
               </span>
               Resize
             </MenuItem>
-            {!isRootElem && (
-              <MenuItem
-                onClick={enableRepositionNoteCatcherFormField}
-                disableRipple
+            <MenuItem
+              onClick={enableRepositionNoteCatcherFormField}
+              disableRipple
+            >
+              <span
+                className={addNoteStyles["note-catcher-form-field-menu-icon"]}
               >
-                <span
-                  className={addNoteStyles["note-catcher-form-field-menu-icon"]}
-                >
-                  <DragIndicatorIcon />
-                </span>
-                Move
-              </MenuItem>
-            )}
+                <DragIndicatorIcon />
+              </span>
+              Move
+            </MenuItem>
             <MenuItem onClick={addRefNoteCatcherFormField} disableRipple>
               <span
                 className={addNoteStyles["note-catcher-form-field-menu-icon"]}
