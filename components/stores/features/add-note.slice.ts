@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { FORM_FIELD_REPOSE_DIRECTION, generateUUID } from "../../utils";
+import {
+  FORM_FIELD_INPUT_TYPES,
+  FORM_FIELD_REPOSE_DIRECTION,
+  generateUUID,
+} from "../../utils";
 
 export interface InputFieldInfo {
   type: string;
@@ -14,6 +18,7 @@ interface NoteCatcherFieldsHierarchy {
   key: string;
   meta: InputFieldInfo;
   childFields: NoteCatcherFieldsHierarchy[];
+  value: string;
 }
 
 export interface InputModifyInfoType {
@@ -40,23 +45,75 @@ export const addNoteSlice = createSlice({
   name: "add-note",
   initialState,
   reducers: {
-    addNewField: (state) => {
+    addNewField: (state, action: PayloadAction<{ type: string }>) => {
+      const { type } = action.payload;
+
       const elemKey = generateUUID();
 
-      const noteCatcherField: NoteCatcherFieldsHierarchy = {
-        key: elemKey,
-        meta: {
-          key: elemKey,
-          type: "input",
-          repositionElement: false,
-          resizeElement: false,
-        },
-        childFields: [],
-      };
-      state.formFields.push(noteCatcherField);
+      switch (type) {
+        case FORM_FIELD_INPUT_TYPES.INPUT:
+          {
+            const noteCatcherField: NoteCatcherFieldsHierarchy = {
+              key: elemKey,
+              meta: {
+                key: elemKey,
+                type: FORM_FIELD_INPUT_TYPES.INPUT,
+                repositionElement: false,
+                resizeElement: false,
+              },
+              childFields: [],
+              value: "",
+            };
+            state.formFields.push(noteCatcherField);
+          }
+
+          break;
+
+        case FORM_FIELD_INPUT_TYPES.IMAGE:
+          {
+            const noteCatcherField: NoteCatcherFieldsHierarchy = {
+              key: elemKey,
+              meta: {
+                key: elemKey,
+                type: FORM_FIELD_INPUT_TYPES.IMAGE,
+                repositionElement: false,
+                resizeElement: false,
+              },
+              childFields: [],
+              value: "",
+            };
+            state.formFields.push(noteCatcherField);
+          }
+
+          break;
+
+        case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
+          {
+            const noteCatcherField: NoteCatcherFieldsHierarchy = {
+              key: elemKey,
+              meta: {
+                key: elemKey,
+                type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME,
+                repositionElement: false,
+                resizeElement: false,
+              },
+              childFields: [],
+              value: "",
+            };
+            state.formFields.push(noteCatcherField);
+          }
+
+          break;
+
+        default:
+          break;
+      }
     },
-    addFieldToParent: (state, action: PayloadAction<{ parentId: string }>) => {
-      const { parentId } = action.payload;
+    addFieldToParent: (
+      state,
+      action: PayloadAction<{ parentId: string; type: string }>,
+    ) => {
+      const { parentId, type } = action.payload;
       const childElemKey = generateUUID();
 
       findElemAndPerformOperation(
@@ -68,18 +125,67 @@ export const addNoteSlice = createSlice({
           currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          const noteCatcherField: NoteCatcherFieldsHierarchy = {
-            key: childElemKey,
-            meta: {
-              key: childElemKey,
-              type: "input",
-              repositionElement: false,
-              resizeElement: false,
-            },
-            childFields: [],
-          };
+          switch (type) {
+            case FORM_FIELD_INPUT_TYPES.INPUT:
+              {
+                const noteCatcherField: NoteCatcherFieldsHierarchy = {
+                  key: childElemKey,
+                  meta: {
+                    key: childElemKey,
+                    type: FORM_FIELD_INPUT_TYPES.INPUT,
+                    repositionElement: false,
+                    resizeElement: false,
+                  },
+                  childFields: [],
+                  value: "",
+                };
 
-          currentFormFieldsList[index].childFields.push(noteCatcherField);
+                currentFormFieldsList[index].childFields.push(noteCatcherField);
+              }
+
+              break;
+
+            case FORM_FIELD_INPUT_TYPES.IMAGE:
+              {
+                const noteCatcherField: NoteCatcherFieldsHierarchy = {
+                  key: childElemKey,
+                  meta: {
+                    key: childElemKey,
+                    type: FORM_FIELD_INPUT_TYPES.IMAGE,
+                    repositionElement: false,
+                    resizeElement: false,
+                  },
+                  childFields: [],
+                  value: "",
+                };
+
+                currentFormFieldsList[index].childFields.push(noteCatcherField);
+              }
+
+              break;
+
+            case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
+              {
+                const noteCatcherField: NoteCatcherFieldsHierarchy = {
+                  key: childElemKey,
+                  meta: {
+                    key: childElemKey,
+                    type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME,
+                    repositionElement: false,
+                    resizeElement: false,
+                  },
+                  childFields: [],
+                  value: "",
+                };
+
+                currentFormFieldsList[index].childFields.push(noteCatcherField);
+              }
+
+              break;
+
+            default:
+              break;
+          }
         },
       );
     },
@@ -102,6 +208,7 @@ export const addNoteSlice = createSlice({
       action: PayloadAction<{ elemKey: string; direction: string }>,
     ) => {
       const { elemKey, direction } = action.payload;
+
       findElemAndPerformOperation(
         elemKey,
         null,
@@ -146,12 +253,16 @@ export const addNoteSlice = createSlice({
 
             case FORM_FIELD_REPOSE_DIRECTION.RIGHT:
               {
+                const tmpCurElemIndex = index;
                 // try to select the upper sibling node
                 index--;
                 while (index >= 0) {
                   // check if any upper node is NOT null
                   if (currentFormFieldsList[index]) {
-                    const tmpCurElem = currentFormFieldsList.splice(index, 1);
+                    const tmpCurElem = currentFormFieldsList.splice(
+                      tmpCurElemIndex,
+                      1,
+                    );
 
                     currentFormFieldsList[index].childFields.push(
                       tmpCurElem[0],
@@ -244,6 +355,27 @@ export const addNoteSlice = createSlice({
         },
       );
     },
+    fieldValueOnChange: (
+      state,
+      action: PayloadAction<{ elemKey: string; value: string }>,
+    ) => {
+      const { elemKey, value } = action.payload;
+      findElemAndPerformOperation(
+        elemKey,
+        null,
+        state.formFields,
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
+          currentFormFieldsList[index].value = value;
+        },
+      );
+    },
+    saveForm: (state) => {
+      state.formFields = [];
+    },
   },
 });
 
@@ -254,6 +386,8 @@ export const {
   repositionField,
   setRepositionElement,
   setResizeElement,
+  fieldValueOnChange,
+  saveForm,
 } = addNoteSlice.actions;
 
 export const addNoteSliceReducer = addNoteSlice.reducer;

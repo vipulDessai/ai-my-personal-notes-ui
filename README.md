@@ -26,15 +26,14 @@ My personal notes managing app powered by AI
 - undo feature for deleting the input form fields in the note catcher
 
 # TODO
-- [x] Add redux
-- [x] Add unit test cases
-- [x] add linter
-- [x] integrate api
-- [x] git workflows
+- [ ] save form data per field state in the redux store
+- [ ] save as draft and create new form
+- [ ] error boundary
+- [x] add gap underneath the last input field
 - [ ] git workflows - fix "act(...) is not supported in production builds of React."
 - [ ] learn more about material UI theme 
     - import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-- [ ] - see why the build/compile in next js is not showing bad TS errors
+- [ ] see why the build/compile in next js is not showing bad TS errors
 
 # linter
 ```ts

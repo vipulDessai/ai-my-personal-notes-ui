@@ -14,3 +14,9 @@ export const FORM_FIELD_RESIZE_DIRECTION = {
   INC: "+",
   DECREASE: "-",
 };
+
+export const FORM_FIELD_INPUT_TYPES = {
+  INPUT: "input",
+  IMAGE: "image",
+  DATE_AND_TIME: "date-time",
+};
