@@ -10,6 +10,7 @@
     height: 100%;
     overflow: auto;
     .note-pad-overflow-content {
+      margin-bottom: 100px;
       .formfield-holder {
         .text-field-container {
           position: relative;
@@ -75,4 +76,11 @@
 .note-catcher-form-field-menu-icon {
   width: 35px;
   display: inline-flex;
+}
+
+.add-note-menu {
+  flex-direction: column;
+  button {
+    margin: 10px 0;
+  }
 }

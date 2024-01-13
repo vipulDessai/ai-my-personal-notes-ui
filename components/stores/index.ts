@@ -59,5 +59,7 @@ export {
   repositionField,
   setRepositionElement,
   setResizeElement,
+  fieldValueOnChange,
+  saveForm,
   type InputModifyInfoType,
 } from "./features/add-note.slice";
