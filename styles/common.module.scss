@@ -32,3 +32,26 @@
     }
   }
 }
+
+.file-upload-custom-button {
+  border: 1px solid #b4b4b4;
+  border-radius: 4px;
+  position: relative;
+  input {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+  }
+  ul {
+    padding: 0 20px 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .icon-holder {
+      display: flex;
+      margin-right: 5px;
+    }
+  }
+}

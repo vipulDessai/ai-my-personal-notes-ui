@@ -12,7 +12,7 @@
     .note-pad-overflow-content {
       margin-bottom: 100px;
       .formfield-holder {
-        .text-field-container {
+        .field-container {
           position: relative;
           display: inline-block;
           .menu {
@@ -52,18 +52,20 @@
             left: 50%;
             transform: translate(-50%, 50%);
           }
-          .highlight-mask {
-            position: absolute;
-            opacity: 0.5;
-            z-index: 1;
-            background-color: red;
-            width: 100%;
-            height: 100%;
-            // because the text field input has different margin
-            // values at top and bottom
-            top: 5px;
-            &.ready-for-modification {
-              background-color: greenyellow;
+          .rendered-field-parent {
+            position: relative;
+            margin: 8px 0;
+            .highlight-mask {
+              position: absolute;
+              opacity: 0.5;
+              z-index: 1;
+              background-color: red;
+              width: 100%;
+              height: 100%;
+              top: 0;
+              &.ready-for-modification {
+                background-color: greenyellow;
+              }
             }
           }
         }
