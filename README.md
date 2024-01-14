@@ -30,6 +30,9 @@ My personal notes managing app powered by AI
 
 # TODO
 - [ ] add title to topic
+- [ ] add country field in input menu
+    - it will be a dropdown
+- [ ] add tags to main note and child elements
 - [ ] save form data per field state in the redux store
 - [ ] save as draft and create new form
 - [ ] error boundary
