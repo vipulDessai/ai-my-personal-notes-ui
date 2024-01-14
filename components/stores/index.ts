@@ -53,8 +53,8 @@ export {
 } from "./features/alert.slice";
 export { showLoader, hideLoader } from "./features/loader.slice";
 export {
+  setShowAddInputMenu,
   addNewField,
-  addFieldToParent,
   removeField,
   repositionField,
   setRepositionElement,

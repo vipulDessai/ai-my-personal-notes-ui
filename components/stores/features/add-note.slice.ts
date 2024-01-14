@@ -24,15 +24,17 @@ interface NoteCatcherFieldsHierarchy {
 export interface InputModifyInfoType {
   inProgress: boolean;
   elemKey: string;
-  actionType: "" | "resize" | "reposition";
+  actionType: "" | "resize" | "reposition" | "add-new-field";
 }
 
 interface AddNoteState {
+  showAddInputMenu: boolean;
   inputModifyInfo: InputModifyInfoType;
   formFields: NoteCatcherFieldsHierarchy[];
 }
 
 const initialState: AddNoteState = {
+  showAddInputMenu: false,
   inputModifyInfo: {
     inProgress: false,
     elemKey: "",
@@ -45,15 +47,42 @@ export const addNoteSlice = createSlice({
   name: "add-note",
   initialState,
   reducers: {
+    setShowAddInputMenu: (
+      state,
+      action: PayloadAction<{ parentId: string; value: boolean }>,
+    ) => {
+      const { parentId, value } = action.payload;
+
+      if (value) {
+        state.showAddInputMenu = true;
+        state.inputModifyInfo = {
+          actionType: "add-new-field",
+          elemKey: parentId,
+          inProgress: true,
+        };
+      } else {
+        state.showAddInputMenu = false;
+        state.inputModifyInfo = {
+          actionType: "",
+          elemKey: "",
+          inProgress: false,
+        };
+      }
+    },
     addNewField: (state, action: PayloadAction<{ type: string }>) => {
       const { type } = action.payload;
+      const {
+        inProgress,
+        actionType,
+        elemKey: parentId,
+      } = state.inputModifyInfo;
 
       const elemKey = generateUUID();
-
+      let noteCatcherField: NoteCatcherFieldsHierarchy;
       switch (type) {
         case FORM_FIELD_INPUT_TYPES.INPUT:
           {
-            const noteCatcherField: NoteCatcherFieldsHierarchy = {
+            noteCatcherField = {
               key: elemKey,
               meta: {
                 key: elemKey,
@@ -64,14 +93,13 @@ export const addNoteSlice = createSlice({
               childFields: [],
               value: "",
             };
-            state.formFields.push(noteCatcherField);
           }
 
           break;
 
         case FORM_FIELD_INPUT_TYPES.IMAGE:
           {
-            const noteCatcherField: NoteCatcherFieldsHierarchy = {
+            noteCatcherField = {
               key: elemKey,
               meta: {
                 key: elemKey,
@@ -82,14 +110,13 @@ export const addNoteSlice = createSlice({
               childFields: [],
               value: "",
             };
-            state.formFields.push(noteCatcherField);
           }
 
           break;
 
         case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
           {
-            const noteCatcherField: NoteCatcherFieldsHierarchy = {
+            noteCatcherField = {
               key: elemKey,
               meta: {
                 key: elemKey,
@@ -100,94 +127,48 @@ export const addNoteSlice = createSlice({
               childFields: [],
               value: "",
             };
-            state.formFields.push(noteCatcherField);
           }
 
           break;
 
         default:
+          noteCatcherField = {
+            key: elemKey,
+            meta: {
+              key: elemKey,
+              type: FORM_FIELD_INPUT_TYPES.INPUT,
+              repositionElement: false,
+              resizeElement: false,
+            },
+            childFields: [],
+            value: "",
+          };
           break;
       }
-    },
-    addFieldToParent: (
-      state,
-      action: PayloadAction<{ parentId: string; type: string }>,
-    ) => {
-      const { parentId, type } = action.payload;
-      const childElemKey = generateUUID();
 
-      findElemAndPerformOperation(
-        parentId,
-        null,
-        state.formFields,
-        (
-          parentField: NoteCatcherFieldsHierarchy[],
-          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
-          index: number,
-        ) => {
-          switch (type) {
-            case FORM_FIELD_INPUT_TYPES.INPUT:
-              {
-                const noteCatcherField: NoteCatcherFieldsHierarchy = {
-                  key: childElemKey,
-                  meta: {
-                    key: childElemKey,
-                    type: FORM_FIELD_INPUT_TYPES.INPUT,
-                    repositionElement: false,
-                    resizeElement: false,
-                  },
-                  childFields: [],
-                  value: "",
-                };
+      if (inProgress && actionType === "add-new-field" && parentId) {
+        findElemAndPerformOperation(
+          parentId,
+          null,
+          state.formFields,
+          (
+            parentField: NoteCatcherFieldsHierarchy[] | null,
+            currentFormFieldsList: NoteCatcherFieldsHierarchy[],
+            index: number,
+          ) => {
+            currentFormFieldsList[index].childFields.push(noteCatcherField);
+          },
+        );
+      } else {
+        state.formFields.push(noteCatcherField);
+      }
 
-                currentFormFieldsList[index].childFields.push(noteCatcherField);
-              }
-
-              break;
-
-            case FORM_FIELD_INPUT_TYPES.IMAGE:
-              {
-                const noteCatcherField: NoteCatcherFieldsHierarchy = {
-                  key: childElemKey,
-                  meta: {
-                    key: childElemKey,
-                    type: FORM_FIELD_INPUT_TYPES.IMAGE,
-                    repositionElement: false,
-                    resizeElement: false,
-                  },
-                  childFields: [],
-                  value: "",
-                };
-
-                currentFormFieldsList[index].childFields.push(noteCatcherField);
-              }
-
-              break;
-
-            case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
-              {
-                const noteCatcherField: NoteCatcherFieldsHierarchy = {
-                  key: childElemKey,
-                  meta: {
-                    key: childElemKey,
-                    type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME,
-                    repositionElement: false,
-                    resizeElement: false,
-                  },
-                  childFields: [],
-                  value: "",
-                };
-
-                currentFormFieldsList[index].childFields.push(noteCatcherField);
-              }
-
-              break;
-
-            default:
-              break;
-          }
-        },
-      );
+      state.showAddInputMenu = false;
+      state.inputModifyInfo = {
+        inProgress: false,
+        elemKey: "",
+        actionType: "",
+      };
     },
     removeField: (state, action: PayloadAction<{ elemKey: string }>) => {
       findElemAndPerformOperation(
@@ -380,8 +361,8 @@ export const addNoteSlice = createSlice({
 });
 
 export const {
+  setShowAddInputMenu,
   addNewField,
-  addFieldToParent,
   removeField,
   repositionField,
   setRepositionElement,

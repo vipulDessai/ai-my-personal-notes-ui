@@ -27,7 +27,6 @@ import {
 import {
   InputModifyInfoType,
   RootState,
-  addFieldToParent,
   addNewField,
   fieldValueOnChange,
   removeField,
@@ -35,6 +34,7 @@ import {
   saveForm,
   setRepositionElement,
   setResizeElement,
+  setShowAddInputMenu,
 } from "../components/stores";
 import { CustomInputBox } from "../components/elements";
 
@@ -56,7 +56,7 @@ export default function AddNote() {
   const dispatch = useDispatch();
   const addNoteStoreState = useSelector((state: RootState) => state.addNote);
 
-  const [showAddInputMenu, setShowAddInputMenu] = useState(false);
+  const { showAddInputMenu } = addNoteStoreState;
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
@@ -137,7 +137,9 @@ export default function AddNote() {
           color="primary"
           aria-label="add"
           className={addNoteStyles["floating-add-note-inputs"]}
-          onClick={() => setShowAddInputMenu(true)}
+          onClick={() =>
+            dispatch(setShowAddInputMenu({ parentId: "", value: true }))
+          }
         >
           <PlusIcon />
         </Fab>
@@ -145,7 +147,9 @@ export default function AddNote() {
           className={addNoteStyles["add-note-menu"]}
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={showAddInputMenu}
-          onClick={() => setShowAddInputMenu(false)}
+          onClick={() =>
+            dispatch(setShowAddInputMenu({ parentId: "", value: false }))
+          }
         >
           <Button
             color="secondary"
@@ -301,12 +305,7 @@ const NoteCatcherFormField = ({
 
   const addChildElemToThisFormField = () => {
     handleClose();
-    dispatch(
-      addFieldToParent({
-        parentId: elemKey,
-        type: FORM_FIELD_INPUT_TYPES.INPUT,
-      }),
-    );
+    dispatch(setShowAddInputMenu({ parentId: elemKey, value: true }));
   };
 
   const inputFieldOnChange = (
