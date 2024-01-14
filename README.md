@@ -2,6 +2,9 @@
 
 My personal notes managing app powered by AI
 
+## what an AI will do?
+1. suggest me tags for the post im creating
+
 ## Note catcher
 - add title
 - click anywhere and just type
@@ -26,6 +29,10 @@ My personal notes managing app powered by AI
 - undo feature for deleting the input form fields in the note catcher
 
 # TODO
+- [ ] add title to topic
+- [ ] add country field in input menu
+    - it will be a dropdown
+- [ ] add tags to main note and child elements
 - [ ] save form data per field state in the redux store
 - [ ] save as draft and create new form
 - [ ] error boundary
@@ -39,3 +46,6 @@ My personal notes managing app powered by AI
 ```ts
 // eslint-disable-next-line no-unused-vars
 ```
+
+# snapshot update
+press <kbd>i</kbd> and then press <kbd>u</kbd>

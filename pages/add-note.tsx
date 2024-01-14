@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 
 import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
@@ -26,7 +27,6 @@ import {
 import {
   InputModifyInfoType,
   RootState,
-  addFieldToParent,
   addNewField,
   fieldValueOnChange,
   removeField,
@@ -34,8 +34,9 @@ import {
   saveForm,
   setRepositionElement,
   setResizeElement,
+  setShowAddInputMenu,
 } from "../components/stores";
-import moment from "moment";
+import { CustomInputBox } from "../components/elements";
 
 const {
   PlusIcon,
@@ -55,7 +56,7 @@ export default function AddNote() {
   const dispatch = useDispatch();
   const addNoteStoreState = useSelector((state: RootState) => state.addNote);
 
-  const [showAddInputMenu, setShowAddInputMenu] = useState(false);
+  const { showAddInputMenu } = addNoteStoreState;
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
@@ -136,7 +137,9 @@ export default function AddNote() {
           color="primary"
           aria-label="add"
           className={addNoteStyles["floating-add-note-inputs"]}
-          onClick={() => setShowAddInputMenu(true)}
+          onClick={() =>
+            dispatch(setShowAddInputMenu({ parentId: "", value: true }))
+          }
         >
           <PlusIcon />
         </Fab>
@@ -144,7 +147,9 @@ export default function AddNote() {
           className={addNoteStyles["add-note-menu"]}
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={showAddInputMenu}
-          onClick={() => setShowAddInputMenu(false)}
+          onClick={() =>
+            dispatch(setShowAddInputMenu({ parentId: "", value: false }))
+          }
         >
           <Button
             color="secondary"
@@ -300,12 +305,7 @@ const NoteCatcherFormField = ({
 
   const addChildElemToThisFormField = () => {
     handleClose();
-    dispatch(
-      addFieldToParent({
-        parentId: elemKey,
-        type: FORM_FIELD_INPUT_TYPES.INPUT,
-      }),
-    );
+    dispatch(setShowAddInputMenu({ parentId: elemKey, value: true }));
   };
 
   const inputFieldOnChange = (
@@ -334,7 +334,6 @@ const NoteCatcherFormField = ({
           <TextField
             style={{ width: `${style.width}px` }}
             label={label}
-            margin="normal"
             multiline
             fullWidth
             value={value}
@@ -346,7 +345,7 @@ const NoteCatcherFormField = ({
       }
 
       case FORM_FIELD_INPUT_TYPES.IMAGE:
-        return <input type="file" name="" id="" />;
+        return <CustomInputBox label={label} />;
 
       case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
         return (
@@ -367,7 +366,7 @@ const NoteCatcherFormField = ({
         marginLeft: `${style.left}px`,
       }}
     >
-      <section className={addNoteStyles["text-field-container"]}>
+      <section className={addNoteStyles["field-container"]}>
         {!siblingInputModifyInfo.inProgress &&
           !resizeElement &&
           !repositionElement && (
@@ -481,18 +480,20 @@ const NoteCatcherFormField = ({
             )}
           </>
         )}
-        {renderFormFieldBasedOnType()}
-        {(resizeElement || repositionElement) && (
-          <section className={addNoteStyles["highlight-mask"]}></section>
-        )}
-        {!resizeElement &&
-          !repositionElement &&
-          siblingInputModifyInfo.inProgress && (
-            <section
-              className={`${addNoteStyles["highlight-mask"]} ${addNoteStyles["ready-for-modification"]}`}
-              onClick={siblingReadyForModificationOnClick}
-            ></section>
+        <section className={addNoteStyles["rendered-field-parent"]}>
+          {renderFormFieldBasedOnType()}
+          {(resizeElement || repositionElement) && (
+            <section className={addNoteStyles["highlight-mask"]}></section>
           )}
+          {!resizeElement &&
+            !repositionElement &&
+            siblingInputModifyInfo.inProgress && (
+              <section
+                className={`${addNoteStyles["highlight-mask"]} ${addNoteStyles["ready-for-modification"]}`}
+                onClick={siblingReadyForModificationOnClick}
+              ></section>
+            )}
+        </section>
       </section>
       {childNodes}
       <Menu
