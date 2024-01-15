@@ -86,3 +86,20 @@
     margin: 10px 0;
   }
 }
+
+.add-note-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .modal-content {
+    background-color: rgb(28, 32, 37);
+    border-radius: 8px;
+    border: 1px solid rgb(67, 77, 91);
+    padding: 10px;
+    width: 90%;
+    color: #ffffff;
+    h2 {
+      margin-top: 0;
+    }
+  }
+}

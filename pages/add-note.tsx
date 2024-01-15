@@ -8,6 +8,7 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Modal,
 } from "@mui/material";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +33,8 @@ import {
   removeField,
   repositionField,
   saveForm,
+  setInputModifyInProgress,
+  setModal,
   setRepositionElement,
   setResizeElement,
   setShowAddInputMenu,
@@ -137,9 +140,16 @@ export default function AddNote() {
           color="primary"
           aria-label="add"
           className={addNoteStyles["floating-add-note-inputs"]}
-          onClick={() =>
-            dispatch(setShowAddInputMenu({ parentId: "", value: true }))
-          }
+          onClick={() => {
+            dispatch(setShowAddInputMenu({ value: true }));
+            dispatch(
+              setInputModifyInProgress({
+                parentId: "",
+                value: true,
+                type: "add-new-field",
+              }),
+            );
+          }}
         >
           <PlusIcon />
         </Fab>
@@ -147,10 +157,24 @@ export default function AddNote() {
           className={addNoteStyles["add-note-menu"]}
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={showAddInputMenu}
-          onClick={() =>
-            dispatch(setShowAddInputMenu({ parentId: "", value: false }))
-          }
+          onClick={() => {
+            dispatch(setShowAddInputMenu({ value: false }));
+            dispatch(
+              setInputModifyInProgress({
+                parentId: "",
+                value: false,
+                type: "",
+              }),
+            );
+          }}
         >
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => dispatch(setModal({ value: true }))}
+          >
+            Tags
+          </Button>
           <Button
             color="secondary"
             variant="contained"
@@ -195,6 +219,23 @@ export default function AddNote() {
             Save As Draft
           </Button>
         </Backdrop>
+
+        <Modal
+          aria-labelledby="unstyled-modal-title"
+          aria-describedby="unstyled-modal-description"
+          open={addNoteStoreState.showModal}
+          onClose={() => dispatch(setModal({ value: false }))}
+          className={addNoteStyles["add-note-modal"]}
+        >
+          <section className={addNoteStyles["modal-content"]}>
+            <h2 id="unstyled-modal-title" className="modal-title">
+              Text in a modal
+            </h2>
+            <p id="unstyled-modal-description" className="modal-description">
+              Aliquid amet deserunt earum!
+            </p>
+          </section>
+        </Modal>
       </main>
 
       <Footer />
@@ -233,7 +274,6 @@ const NoteCatcherFormField = ({
     left: 50,
     width: 300,
   });
-  const [tags, setTags] = useState();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOnMenuClick = (event: MouseEvent<HTMLElement>) => {
@@ -305,7 +345,14 @@ const NoteCatcherFormField = ({
 
   const addChildElemToThisFormField = () => {
     handleClose();
-    dispatch(setShowAddInputMenu({ parentId: elemKey, value: true }));
+    dispatch(setShowAddInputMenu({ value: true }));
+    dispatch(
+      setInputModifyInProgress({
+        parentId: elemKey,
+        value: true,
+        type: "add-new-field",
+      }),
+    );
   };
 
   const inputFieldOnChange = (

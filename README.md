@@ -30,9 +30,12 @@ My personal notes managing app powered by AI
 
 # TODO
 - [ ] add title to topic
+- [ ] git precommit
+- [ ] git hooks
 - [ ] add country field in input menu
     - it will be a dropdown
 - [ ] add tags to main note and child elements
+- [ ] add image list from material ui for file uploads
 - [ ] save form data per field state in the redux store
 - [ ] save as draft and create new form
 - [ ] error boundary

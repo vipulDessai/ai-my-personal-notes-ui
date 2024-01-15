@@ -54,6 +54,8 @@ export {
 export { showLoader, hideLoader } from "./features/loader.slice";
 export {
   setShowAddInputMenu,
+  setModal,
+  setInputModifyInProgress,
   addNewField,
   removeField,
   repositionField,
