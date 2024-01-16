@@ -4,6 +4,7 @@ My personal notes managing app powered by AI
 
 ## what an AI will do?
 1. suggest me tags for the post im creating
+2. ask me question based on the topic i pick (for revision)
 
 ## Note catcher
 - add title
