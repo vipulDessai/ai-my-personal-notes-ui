@@ -8,8 +8,8 @@ import { resetAlert } from "./stores/features/alert.slice";
 
 export const CommonFeedbackComponents = () => {
   const dispatch = useDispatch();
-  const showLoader = useSelector((state: RootState) => state.loader);
-  const alertData = useSelector((state: RootState) => state.alert);
+  const showLoader = useSelector((state: RootState) => state.root.loader);
+  const alertData = useSelector((state: RootState) => state.root.alert);
 
   return (
     <>

@@ -1,29 +1,39 @@
-import { configureStore, Tuple } from "@reduxjs/toolkit";
+import { combineReducers, configureStore, Tuple } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { thunk } from "redux-thunk";
 
-import { counterSliceReducer } from "./features/counter.slice";
 import { alertSliceReducer } from "./features/alert.slice";
 import { commonLoaderSliceReducer } from "./features/loader.slice";
 import { addNoteSliceReducer } from "./features/add-note.slice";
+import { tagsSliceReducer } from "./features/tags.slice";
 
-const persistConfig = {
+const rootPersistConfig = {
   key: "root",
   storage,
 };
 
-const persistedAddNoteSliceReducer = persistReducer(
-  persistConfig,
-  addNoteSliceReducer,
+const combinedAsyncSlices = combineReducers({
+  addNote: persistReducer({ key: "addNote", storage }, addNoteSliceReducer),
+  tags: persistReducer(
+    {
+      key: "tags",
+      storage,
+    },
+    tagsSliceReducer,
+  ),
+  alert: alertSliceReducer,
+  loader: commonLoaderSliceReducer,
+});
+
+const rootPersistReducer = persistReducer(
+  rootPersistConfig,
+  combinedAsyncSlices,
 );
 
 export const globalStore = configureStore({
   reducer: {
-    counter: counterSliceReducer,
-    alert: alertSliceReducer,
-    loader: commonLoaderSliceReducer,
-    addNote: persistedAddNoteSliceReducer,
+    root: rootPersistReducer,
   },
   // eslint-disable-next-line no-unused-vars
   middleware: (getDefaultMiddleware) => {
@@ -39,11 +49,6 @@ export type AppDispatch = typeof globalStore.dispatch;
 export const persistedGlobalStore = persistStore(globalStore);
 
 // dispatch events
-export {
-  decrement,
-  increment,
-  incrementByAmount,
-} from "./features/counter.slice";
 export {
   setError,
   setInfo,
@@ -65,3 +70,4 @@ export {
   saveForm,
   type InputModifyInfoType,
 } from "./features/add-note.slice";
+export { fetchTagsByGroupId } from "./features/tags.slice";

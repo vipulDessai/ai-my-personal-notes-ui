@@ -35,6 +35,8 @@ My personal notes managing app powered by AI
 - [ ] git hooks
 - [ ] add country field in input menu
     - it will be a dropdown
+- [ ] check the memo is required or not for following
+    - add note
 - [ ] add tags to main note and child elements
 - [ ] add image list from material ui for file uploads
 - [ ] save form data per field state in the redux store

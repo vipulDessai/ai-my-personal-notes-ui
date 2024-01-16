@@ -1,4 +1,4 @@
-import { MouseEvent, ChangeEvent, useState } from "react";
+import { MouseEvent, ChangeEvent, useState, useEffect } from "react";
 import Head from "next/head";
 import {
   Button,
@@ -29,6 +29,7 @@ import {
   InputModifyInfoType,
   RootState,
   addNewField,
+  fetchTagsByGroupId,
   fieldValueOnChange,
   removeField,
   repositionField,
@@ -57,9 +58,15 @@ const {
 
 export default function AddNote() {
   const dispatch = useDispatch();
-  const addNoteStoreState = useSelector((state: RootState) => state.addNote);
+  const addNoteStoreState = useSelector(
+    (state: RootState) => state.root.addNote,
+  );
 
   const { showAddInputMenu } = addNoteStoreState;
+
+  useEffect(() => {
+    dispatch(fetchTagsByGroupId("some group id"));
+  }, []);
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
