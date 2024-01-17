@@ -1,4 +1,10 @@
-import { MouseEvent, ChangeEvent, useState, useEffect } from "react";
+import {
+  MouseEvent,
+  ChangeEvent,
+  useState,
+  useEffect,
+  forwardRef,
+} from "react";
 import Head from "next/head";
 import {
   Button,
@@ -26,9 +32,11 @@ import {
   pageTitles,
 } from "../components/utils";
 import {
+  AppDispatch,
   InputModifyInfoType,
   RootState,
   addNewField,
+  clearTags,
   fetchTagsByGroupId,
   fieldValueOnChange,
   removeField,
@@ -57,16 +65,12 @@ const {
 } = iconComponents;
 
 export default function AddNote() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const addNoteStoreState = useSelector(
     (state: RootState) => state.root.addNote,
   );
 
   const { showAddInputMenu } = addNoteStoreState;
-
-  useEffect(() => {
-    dispatch(fetchTagsByGroupId("some group id"));
-  }, []);
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
@@ -234,14 +238,7 @@ export default function AddNote() {
           onClose={() => dispatch(setModal({ value: false }))}
           className={addNoteStyles["add-note-modal"]}
         >
-          <section className={addNoteStyles["modal-content"]}>
-            <h2 id="unstyled-modal-title" className="modal-title">
-              Text in a modal
-            </h2>
-            <p id="unstyled-modal-description" className="modal-description">
-              Aliquid amet deserunt earum!
-            </p>
-          </section>
+          <ModalTagsContainer />
         </Modal>
       </main>
 
@@ -275,7 +272,7 @@ const NoteCatcherFormField = ({
   siblingInputModifyInfo,
   value,
 }: NoteCatcherFormFieldType) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [style, setStyle] = useState({
     left: 50,
@@ -593,3 +590,35 @@ const NoteCatcherFormField = ({
     </section>
   );
 };
+
+const ModalTagsContainer = forwardRef(() => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchTagsByGroupId("some group id"));
+  }, []);
+
+  const tagseStoreState = useSelector((state: RootState) => state.root.tags);
+
+  return (
+    <section className={addNoteStyles["modal-content"]}>
+      <h2 id="unstyled-modal-title" className="modal-title">
+        Tags
+      </h2>
+      <ul>
+        {tagseStoreState.tags.map((t, index) => (
+          <li key={index}>{t}</li>
+        ))}
+      </ul>
+      {tagseStoreState.tags.length > 0 && (
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => dispatch(clearTags())}
+        >
+          clear
+        </Button>
+      )}
+    </section>
+  );
+});

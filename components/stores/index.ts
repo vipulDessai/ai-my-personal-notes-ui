@@ -8,11 +8,6 @@ import { commonLoaderSliceReducer } from "./features/loader.slice";
 import { addNoteSliceReducer } from "./features/add-note.slice";
 import { tagsSliceReducer } from "./features/tags.slice";
 
-const rootPersistConfig = {
-  key: "root",
-  storage,
-};
-
 const combinedAsyncSlices = combineReducers({
   addNote: persistReducer({ key: "addNote", storage }, addNoteSliceReducer),
   tags: persistReducer(
@@ -26,6 +21,10 @@ const combinedAsyncSlices = combineReducers({
   loader: commonLoaderSliceReducer,
 });
 
+const rootPersistConfig = {
+  key: "root",
+  storage,
+};
 const rootPersistReducer = persistReducer(
   rootPersistConfig,
   combinedAsyncSlices,
@@ -58,6 +57,7 @@ export {
 } from "./features/alert.slice";
 export { showLoader, hideLoader } from "./features/loader.slice";
 export {
+  initialState,
   setShowAddInputMenu,
   setModal,
   setInputModifyInProgress,
@@ -70,4 +70,4 @@ export {
   saveForm,
   type InputModifyInfoType,
 } from "./features/add-note.slice";
-export { fetchTagsByGroupId } from "./features/tags.slice";
+export { fetchTagsByGroupId, clearTags, getTags } from "./features/tags.slice";

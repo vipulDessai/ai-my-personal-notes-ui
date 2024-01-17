@@ -33,6 +33,7 @@ My personal notes managing app powered by AI
 - [ ] add title to topic
 - [ ] git precommit
 - [ ] git hooks
+- [ ] RTK query
 - [ ] add country field in input menu
     - it will be a dropdown
 - [ ] check the memo is required or not for following

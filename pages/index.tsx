@@ -8,10 +8,15 @@ import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
 import { pageTitles, getData, errorHandler } from "../components/utils";
-import { hideLoader, setError, showLoader } from "../components/stores";
+import {
+  AppDispatch,
+  hideLoader,
+  setError,
+  showLoader,
+} from "../components/stores";
 
 export default function Home() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const defualtRetuarantnNamesValue: string[] = [];
   const [restuarantNames, setRestuarantNames] = useState(

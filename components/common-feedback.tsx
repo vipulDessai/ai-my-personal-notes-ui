@@ -3,11 +3,11 @@ import { Alert, AlertTitle, Backdrop, CircularProgress } from "@mui/material";
 
 import commonFeedback from "./common-feedback.module.scss";
 
-import { RootState } from "./stores";
+import { AppDispatch, RootState } from "./stores";
 import { resetAlert } from "./stores/features/alert.slice";
 
 export const CommonFeedbackComponents = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const showLoader = useSelector((state: RootState) => state.root.loader);
   const alertData = useSelector((state: RootState) => state.root.alert);
 

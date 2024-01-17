@@ -35,7 +35,7 @@ interface AddNoteState {
   formFields: NoteCatcherFieldsHierarchy[];
 }
 
-const initialState: AddNoteState = {
+export const initialState: AddNoteState = {
   showAddInputMenu: false,
   showModal: false,
   inputModifyInfo: {

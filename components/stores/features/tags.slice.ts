@@ -23,6 +23,9 @@ export const tagsSlice = createSlice({
         value: boolean;
       }>,
     ) => {},
+    clearTags: (state) => {
+      state.tags = [];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchTagsByGroupId.pending, (state) => {
@@ -39,14 +42,14 @@ export const tagsSlice = createSlice({
   },
 });
 
-export const { getTags } = tagsSlice.actions;
+export const { getTags, clearTags } = tagsSlice.actions;
 
 export const tagsSliceReducer = tagsSlice.reducer;
 
 const tags = ["tag1", "tag2", "tag3", "tag4", "tag5"];
 export const fetchTagsByGroupId = createAsyncThunk(
   "tags/group",
-  async (userId: number, thunkAPI) => {
+  async (groupId: string, thunkAPI) => {
     const response: any = await new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(tags);
