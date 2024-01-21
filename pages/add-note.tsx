@@ -591,34 +591,36 @@ const NoteCatcherFormField = ({
   );
 };
 
-const ModalTagsContainer = forwardRef(() => {
-  const dispatch = useDispatch<AppDispatch>();
+const ModalTagsContainer = forwardRef(
+  function ModalTagsContainerComponentFunc() {
+    const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    dispatch(fetchTagsByGroupId("some group id"));
-  }, []);
+    useEffect(() => {
+      dispatch(fetchTagsByGroupId("some group id"));
+    }, []);
 
-  const tagseStoreState = useSelector((state: RootState) => state.root.tags);
+    const tagseStoreState = useSelector((state: RootState) => state.root.tags);
 
-  return (
-    <section className={addNoteStyles["modal-content"]}>
-      <h2 id="unstyled-modal-title" className="modal-title">
-        Tags
-      </h2>
-      <ul>
-        {tagseStoreState.tags.map((t, index) => (
-          <li key={index}>{t}</li>
-        ))}
-      </ul>
-      {tagseStoreState.tags.length > 0 && (
-        <Button
-          color="secondary"
-          variant="contained"
-          onClick={() => dispatch(clearTags())}
-        >
-          clear
-        </Button>
-      )}
-    </section>
-  );
-});
+    return (
+      <section className={addNoteStyles["modal-content"]}>
+        <h2 id="unstyled-modal-title" className="modal-title">
+          Tags
+        </h2>
+        <ul>
+          {tagseStoreState.tags.map((t, index) => (
+            <li key={index}>{t}</li>
+          ))}
+        </ul>
+        {tagseStoreState.tags.length > 0 && (
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => dispatch(clearTags())}
+          >
+            clear
+          </Button>
+        )}
+      </section>
+    );
+  },
+);

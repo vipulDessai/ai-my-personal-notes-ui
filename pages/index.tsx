@@ -7,7 +7,12 @@ import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
-import { pageTitles, getData, errorHandler } from "../components/utils";
+import {
+  pageTitles,
+  getData,
+  errorHandler,
+  postData,
+} from "../components/utils";
 import {
   AppDispatch,
   hideLoader,
@@ -43,6 +48,24 @@ export default function Home() {
     dispatch(hideLoader());
   };
 
+  const makeGraphQlLambdaCall = async () => {
+    dispatch(showLoader());
+    try {
+      // const res = await getData(
+      //   "https://7ryqgloudd.execute-api.us-east-1.amazonaws.com/",
+      // );
+      const res = await postData(
+        "https://7ryqgloudd.execute-api.us-east-1.amazonaws.com/api/values",
+        {},
+      );
+
+      console.log(res);
+    } catch (error) {
+      dispatch(setError(errorHandler(error)));
+    }
+    dispatch(hideLoader());
+  };
+
   return (
     <div className={commonStyles.container}>
       <Head>
@@ -57,6 +80,10 @@ export default function Home() {
         <section className={homePageStyles["api-call-tester"]}>
           <Button variant="outlined" onClick={makeApiCallTest}>
             API call
+          </Button>
+          <br></br>
+          <Button variant="outlined" onClick={makeGraphQlLambdaCall}>
+            GraphQL call
           </Button>
           <ul>
             {restuarantNames.map((r, uniqueKey) => (

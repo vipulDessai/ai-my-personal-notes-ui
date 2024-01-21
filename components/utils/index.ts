@@ -5,6 +5,6 @@ export {
   FORM_FIELD_INPUT_TYPES,
 } from "./constant";
 export { errorHandler } from "./reponse-handler.helper";
-export { getData } from "./api-caller.helper";
+export { getData, postData } from "./api-caller.helper";
 export { iconComponents, svg } from "./icons";
 export { generateUUID } from "./common.helper";
