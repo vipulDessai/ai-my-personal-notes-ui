@@ -20,3 +20,5 @@ export const FORM_FIELD_INPUT_TYPES = {
   IMAGE: "image",
   DATE_AND_TIME: "date-time",
 };
+
+export const APP_DATE_TIME_FORMAT = "YYYY-MM-DDTHH:mm";

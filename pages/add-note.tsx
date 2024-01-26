@@ -25,6 +25,7 @@ import addNoteStyles from "./add-note.module.scss";
 
 import { Header, Footer } from "../components";
 import {
+  APP_DATE_TIME_FORMAT,
   FORM_FIELD_INPUT_TYPES,
   FORM_FIELD_REPOSE_DIRECTION,
   FORM_FIELD_RESIZE_DIRECTION,
@@ -359,22 +360,18 @@ const NoteCatcherFormField = ({
     );
   };
 
-  const inputFieldOnChange = (
-    event: ChangeEvent<HTMLElement>,
-    type: string,
+  const inputFieldOnChange = (event: ChangeEvent<HTMLElement>) => {
+    const { value } = (event.target || event.currentTarget) as HTMLInputElement;
+    dispatch(fieldValueOnChange({ elemKey, value: value }));
+  };
+
+  const dateTimeFieldOnChange = (
+    currentlySelectedDateInfo: moment.Moment | null,
   ) => {
-    switch (type) {
-      case FORM_FIELD_INPUT_TYPES.INPUT:
-        {
-          const { value } = (event.target ||
-            event.currentTarget) as HTMLInputElement;
-          dispatch(fieldValueOnChange({ elemKey, value: value }));
-        }
+    if (currentlySelectedDateInfo) {
+      const value = currentlySelectedDateInfo.format("YYYY-MM-DDTHH:mm");
 
-        break;
-
-      default:
-        break;
+      dispatch(fieldValueOnChange({ elemKey, value: value }));
     }
   };
 
@@ -388,9 +385,7 @@ const NoteCatcherFormField = ({
             multiline
             fullWidth
             value={value}
-            onChange={(e) =>
-              inputFieldOnChange(e, FORM_FIELD_INPUT_TYPES.INPUT)
-            }
+            onChange={(e) => inputFieldOnChange(e)}
           />
         );
       }
@@ -398,10 +393,24 @@ const NoteCatcherFormField = ({
       case FORM_FIELD_INPUT_TYPES.IMAGE:
         return <CustomInputBox label={label} />;
 
-      case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
-        return (
-          <MobileDateTimePicker defaultValue={moment("2022-04-17T15:30")} />
-        );
+      case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME: {
+        if (value) {
+          const formatedDate = moment(value).format(APP_DATE_TIME_FORMAT);
+          return (
+            <MobileDateTimePicker
+              onAccept={dateTimeFieldOnChange}
+              defaultValue={moment(formatedDate)}
+            />
+          );
+        } else {
+          return (
+            <MobileDateTimePicker
+              onAccept={dateTimeFieldOnChange}
+              defaultValue={moment()}
+            />
+          );
+        }
+      }
 
       default:
         break;
