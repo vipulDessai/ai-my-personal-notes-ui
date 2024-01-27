@@ -369,7 +369,7 @@ const NoteCatcherFormField = ({
     currentlySelectedDateInfo: moment.Moment | null,
   ) => {
     if (currentlySelectedDateInfo) {
-      const value = currentlySelectedDateInfo.format("YYYY-MM-DDTHH:mm");
+      const value = currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
 
       dispatch(fieldValueOnChange({ elemKey, value: value }));
     }
