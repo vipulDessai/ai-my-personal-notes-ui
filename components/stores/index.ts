@@ -7,6 +7,7 @@ import { alertSliceReducer } from "./features/alert.slice";
 import { commonLoaderSliceReducer } from "./features/loader.slice";
 import { addNoteSliceReducer } from "./features/add-note.slice";
 import { tagsSliceReducer } from "./features/tags.slice";
+import { userSliceReducer } from "./features/user.slice";
 
 const combinedAsyncSlices = combineReducers({
   addNote: persistReducer({ key: "addNote", storage }, addNoteSliceReducer),
@@ -16,6 +17,13 @@ const combinedAsyncSlices = combineReducers({
       storage,
     },
     tagsSliceReducer,
+  ),
+  user: persistReducer(
+    {
+      key: "user",
+      storage,
+    },
+    userSliceReducer,
   ),
   alert: alertSliceReducer,
   loader: commonLoaderSliceReducer,
@@ -71,3 +79,4 @@ export {
   type InputModifyInfoType,
 } from "./features/add-note.slice";
 export { fetchTagsByGroupId, clearTags, getTags } from "./features/tags.slice";
+export { fetchAuthToken } from "./features/user.slice";

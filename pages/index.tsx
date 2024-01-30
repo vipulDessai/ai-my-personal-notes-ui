@@ -51,12 +51,26 @@ export default function Home() {
   const makeGraphQlLambdaCall = async () => {
     dispatch(showLoader());
     try {
-      // const res = await getData(
-      //   "https://7ryqgloudd.execute-api.us-east-1.amazonaws.com/",
-      // );
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization:
+          "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIwYmFmMGU0Ni1jMTRjLTRhN2ItYTk2ZC02NjYyNGJkM2E0OGIiLCJuYW1lIjoiaHJsZWFkZXJAZXhhbXBsZS5jb20iLCJyb2xlIjpbImhyIiwibGVhZGVyIl0sIm5iZiI6MTcwNjE5MDIwNiwiZXhwIjoxNzEzOTY2MjA2LCJpYXQiOjE3MDYxOTAyMDYsImlzcyI6Imlzc3VlciIsImF1ZCI6ImF1ZGllbmNlIn0.i0MRrHBrAaXLYjafp6X6DkHQ_Fjxq-0TlJk4Q681K60",
+      };
+      const payload = JSON.stringify({
+        query: `query getNote {
+          notes (input: {
+            batchSize: 10,
+          }) {
+            statusCode
+            body
+          }
+        }`,
+        variables: {},
+      });
       const res = await postData(
-        "https://7ryqgloudd.execute-api.us-east-1.amazonaws.com/api/values",
-        {},
+        `${process.env.NEXT_PUBLIC_API_HOST}/graphql`,
+        payload,
+        headers,
       );
 
       console.log(res);
