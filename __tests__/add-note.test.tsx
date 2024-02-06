@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from "../__mocks__/react-redux";
 
 import { initialState as addNoteStoreState } from "../components/stores";
 
+jest.mock("../components/Header");
+
 describe("Add Note", () => {
   it("renders the add note page", () => {
     useSelector.mockImplementation(() => ({ ...addNoteStoreState }));

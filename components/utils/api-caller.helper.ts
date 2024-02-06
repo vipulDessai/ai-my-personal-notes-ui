@@ -5,7 +5,7 @@ export const getData = async (url: string) => {
   return r.data;
 };
 
-export const postData = async (url: string, payload: any, headers?: any) => {
+export const postData = async <T>(url: string, payload: any, headers?: any) => {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -13,7 +13,7 @@ export const postData = async (url: string, payload: any, headers?: any) => {
     headers,
     data: payload,
   };
-  const r = await axios.request(config);
+  const r = await axios.request<T>(config);
   return r.data;
 };
 

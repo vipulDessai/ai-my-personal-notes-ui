@@ -5,6 +5,8 @@ import Home from "../pages/index";
 
 import { useRouter } from "../__mocks__/next/router";
 
+jest.mock("../components/Header");
+
 describe("Home", () => {
   it("renders a heading", () => {
     // TODO: remove this meaning less mocker test 😁

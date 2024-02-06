@@ -10,15 +10,21 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  CircularProgress,
 } from "@mui/material";
 
 import { iconComponents, pageTitles } from "./utils";
+import { useSelector } from "react-redux";
+import { RootState } from "./stores";
 
 const { InboxIcon, MailIcon, MenuIcon } = iconComponents;
 
 export function SidePanel() {
   const router = useRouter();
   const [showSideMenu, setShowSideMenu] = useState(false);
+  const isLoading = useSelector(
+    (state: RootState) => state.root.user.isLoading,
+  );
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -40,6 +46,20 @@ export function SidePanel() {
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
+      <List>
+        <ListItem>
+          {isLoading && <CircularProgress color="inherit" />}
+          {!isLoading && (
+            <>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary={"User"} />
+            </>
+          )}
+        </ListItem>
+      </List>
+      <Divider />
       <List>
         <ListItem disablePadding>
           <ListItemButton

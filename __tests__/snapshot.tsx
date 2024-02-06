@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "../__mocks__/react-redux";
 import { useRouter } from "../__mocks__/next/router";
 import { initialState as addNoteStoreState } from "../components/stores";
 
+jest.mock("../components/Header");
+
 it("renders homepage unchanged", () => {
   // TODO: remove this meaning less mocker test 😁
   useRouter.mockImplementation(() => [{ foo: "bar" }]);
