@@ -3,8 +3,7 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { thunk } from "redux-thunk";
 
-import { alertSliceReducer } from "./features/alert.slice";
-import { commonLoaderSliceReducer } from "./features/loader.slice";
+import { appFeedbackSliceReducer } from "./features/feedback.slice";
 import { addNoteSliceReducer } from "./features/add-note.slice";
 import { tagsSliceReducer } from "./features/tags.slice";
 import { userSliceReducer } from "./features/user.slice";
@@ -18,6 +17,7 @@ const combinedAsyncSlices = combineReducers({
     },
     tagsSliceReducer,
   ),
+  appFeed: appFeedbackSliceReducer,
   user: persistReducer(
     {
       key: "user",
@@ -25,8 +25,6 @@ const combinedAsyncSlices = combineReducers({
     },
     userSliceReducer,
   ),
-  alert: alertSliceReducer,
-  loader: commonLoaderSliceReducer,
 });
 
 const rootPersistConfig = {
@@ -55,15 +53,15 @@ export type AppDispatch = typeof globalStore.dispatch;
 
 export const persistedGlobalStore = persistStore(globalStore);
 
-// dispatch events
 export {
+  showLoader,
+  hideLoader,
   setError,
   setInfo,
-  setWarning,
   setSuccess,
+  setWarning,
   resetAlert,
-} from "./features/alert.slice";
-export { showLoader, hideLoader } from "./features/loader.slice";
+} from "./features/feedback.slice";
 export {
   initialState,
   setShowAddInputMenu,

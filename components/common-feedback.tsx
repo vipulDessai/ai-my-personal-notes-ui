@@ -3,17 +3,18 @@ import { Alert, AlertTitle, Backdrop, CircularProgress } from "@mui/material";
 
 import commonFeedback from "./common-feedback.module.scss";
 
-import { AppDispatch, RootState } from "./stores";
-import { resetAlert } from "./stores/features/alert.slice";
+import { AppDispatch, RootState, resetAlert } from "./stores";
 
 export const CommonFeedbackComponents = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const showLoader = useSelector((state: RootState) => state.root.loader);
-  const alertData = useSelector((state: RootState) => state.root.alert);
+  const showLoader = useSelector(
+    (state: RootState) => state.root.appFeed.loadingInProgress,
+  );
+  const alertData = useSelector((state: RootState) => state.root.appFeed.alert);
 
   return (
     <>
-      {showLoader.loadingInProgress && (
+      {showLoader && (
         <section className={commonFeedback["common-progress"]}>
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}

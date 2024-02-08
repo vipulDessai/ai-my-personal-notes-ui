@@ -19,6 +19,7 @@ export const postData = async <T>(url: string, payload: any, headers?: any) => {
 
 axios.interceptors.request.use(
   (config) => {
+    // eslint-disable-next-line no-unused-vars
     const { headers } = config;
     return config;
   },
