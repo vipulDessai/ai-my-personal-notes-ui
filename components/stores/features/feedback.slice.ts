@@ -10,6 +10,7 @@ export interface asyncTasksState {
     type: Severity;
   };
   loadingInProgress: boolean;
+  notifications: string[];
 }
 
 export interface alertStatePayload {
@@ -24,10 +25,11 @@ const initialState: asyncTasksState = {
     type: "info",
   },
   loadingInProgress: false,
+  notifications: [],
 };
 
 export const appFeedbackSlice = createSlice({
-  name: "common-loader",
+  name: "app-feedback",
   initialState,
   reducers: {
     showLoader: (state) => {
@@ -63,6 +65,12 @@ export const appFeedbackSlice = createSlice({
       state.alert.message = "";
       state.alert.title = "";
     },
+    addNotifications: (state, action: PayloadAction<string>) => {
+      state.notifications.push(action.payload);
+    },
+    removeNotifications: (state, action: PayloadAction<{ index: number }>) => {
+      state.notifications.splice(action.payload.index, 1);
+    },
   },
 });
 
@@ -74,6 +82,8 @@ export const {
   setWarning,
   setSuccess,
   resetAlert,
+  addNotifications,
+  removeNotifications,
 } = appFeedbackSlice.actions;
 
 export const appFeedbackSliceReducer = appFeedbackSlice.reducer;

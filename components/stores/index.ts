@@ -9,7 +9,7 @@ import { tagsSliceReducer } from "./features/tags.slice";
 import { userSliceReducer } from "./features/user.slice";
 
 const combinedAsyncSlices = combineReducers({
-  addNote: persistReducer({ key: "addNote", storage }, addNoteSliceReducer),
+  addNote: persistReducer({ key: "add-note", storage }, addNoteSliceReducer),
   tags: persistReducer(
     {
       key: "tags",
@@ -61,6 +61,8 @@ export {
   setSuccess,
   setWarning,
   resetAlert,
+  addNotifications,
+  removeNotifications,
 } from "./features/feedback.slice";
 export {
   initialState,

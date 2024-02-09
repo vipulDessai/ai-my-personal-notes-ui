@@ -31,7 +31,7 @@ export const userSlice = createSlice({
       state.isLoading = true;
     });
     builder.addCase(fetchAuthToken.rejected, (state, action) => {
-      state.error = action.payload;
+      state.error = action.error;
       state.isLoading = false;
     });
   },
