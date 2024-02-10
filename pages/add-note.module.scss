@@ -98,8 +98,31 @@
     padding: 10px;
     width: 90%;
     color: #ffffff;
-    h2 {
-      margin-top: 0;
+    .tags-searcher {
+      margin-block-end: 19.92px;
+      input {
+        color: #fff;
+      }
+    }
+    header {
+      h2 {
+        margin-top: 0;
+      }
+    }
+    .tags-holder {
+      max-height: 400px;
+      overflow: auto;
+      .loading-content {
+        text-align: center;
+      }
+      .chip-for-tags {
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+    }
+    footer {
+      margin-block-start: 19.92px;
+      text-align: right;
     }
   }
 }

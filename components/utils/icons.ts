@@ -14,6 +14,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DoneIcon from "@mui/icons-material/Done";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 /** Material UI Icons <END> */
 
 import logo from "../../public/note-manager-app-main-logo.svg";
@@ -40,4 +41,5 @@ export const iconComponents = {
   ArrowDropDownIcon,
   DoneIcon,
   FileUploadIcon,
+  AccountCircleIcon,
 };

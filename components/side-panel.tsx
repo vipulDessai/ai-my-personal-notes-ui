@@ -17,7 +17,7 @@ import { iconComponents, pageTitles } from "./utils";
 import { useSelector } from "react-redux";
 import { RootState } from "./stores";
 
-const { InboxIcon, MailIcon, MenuIcon } = iconComponents;
+const { InboxIcon, MailIcon, MenuIcon, AccountCircleIcon } = iconComponents;
 
 export function SidePanel() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export function SidePanel() {
           {!isLoading && (
             <>
               <ListItemIcon>
-                <InboxIcon />
+                <AccountCircleIcon />
               </ListItemIcon>
               <ListItemText primary={"User"} />
             </>

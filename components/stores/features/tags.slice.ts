@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 interface TagsStateType {
-  tags: string[];
+  tags: [string, string][];
   isLoading: boolean;
   error: any;
 }
@@ -46,12 +46,15 @@ export const { getTags, clearTags } = tagsSlice.actions;
 
 export const tagsSliceReducer = tagsSlice.reducer;
 
-const tags = ["tag1", "tag2", "tag3", "tag4", "tag5"];
 export const fetchTagsByGroupId = createAsyncThunk(
   "tags/group",
   async (groupId: string, thunkAPI) => {
     const response: any = await new Promise((resolve, reject) => {
       setTimeout(() => {
+        const tags: [string, string][] = [];
+        for (let i = 0; i < 1000; ++i) {
+          tags.push([`id${i}`, `tag${i + 1}`]);
+        }
         resolve(tags);
       }, 1000);
     });

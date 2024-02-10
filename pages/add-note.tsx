@@ -15,6 +15,8 @@ import {
   MenuItem,
   Divider,
   Modal,
+  CircularProgress,
+  Chip,
 } from "@mui/material";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
@@ -603,32 +605,69 @@ const NoteCatcherFormField = ({
 const ModalTagsContainer = forwardRef(
   function ModalTagsContainerComponentFunc() {
     const dispatch = useDispatch<AppDispatch>();
+    const tagseStoreState = useSelector((state: RootState) => state.root.tags);
 
     useEffect(() => {
-      dispatch(fetchTagsByGroupId("some group id"));
+      if (tagseStoreState.tags.length == 0)
+        dispatch(fetchTagsByGroupId("some group id"));
     }, []);
-
-    const tagseStoreState = useSelector((state: RootState) => state.root.tags);
 
     return (
       <section className={addNoteStyles["modal-content"]}>
-        <h2 id="unstyled-modal-title" className="modal-title">
-          Tags
-        </h2>
-        <ul>
-          {tagseStoreState.tags.map((t, index) => (
-            <li key={index}>{t}</li>
-          ))}
-        </ul>
-        {tagseStoreState.tags.length > 0 && (
-          <Button
+        <header>
+          <h2 id="unstyled-modal-title" className="modal-title">
+            Tags
+          </h2>
+        </header>
+        <section className={addNoteStyles["tags-searcher"]}>
+          <TextField
+            label="Search Tags"
+            variant="outlined"
+            fullWidth
             color="secondary"
-            variant="contained"
-            onClick={() => dispatch(clearTags())}
-          >
-            clear
-          </Button>
-        )}
+            focused
+          />
+        </section>
+        <section className={addNoteStyles["tags-holder"]}>
+          {tagseStoreState.isLoading && (
+            <section className={addNoteStyles["loading-content"]}>
+              <CircularProgress color="inherit" />
+            </section>
+          )}
+          {tagseStoreState.tags.map((t) => {
+            const [key, value] = t;
+
+            return (
+              <Chip
+                className={addNoteStyles["chip-for-tags"]}
+                sx={{ color: "#fff" }}
+                key={key}
+                label={value}
+                variant="outlined"
+              />
+            );
+          })}
+        </section>
+        <footer>
+          {tagseStoreState.tags.length > 0 && (
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={() => dispatch(clearTags())}
+            >
+              clear
+            </Button>
+          )}
+          {tagseStoreState.tags.length == 0 && (
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={() => dispatch(fetchTagsByGroupId("some group id"))}
+            >
+              re-fetch
+            </Button>
+          )}
+        </footer>
       </section>
     );
   },
