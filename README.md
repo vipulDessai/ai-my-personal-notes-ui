@@ -30,6 +30,8 @@ My personal notes managing app powered by AI
 - undo feature for deleting the input form fields in the note catcher
 
 # TODO
+- [ ] add apollo graphQl fetcher
+    - https://stackoverflow.com/questions/65127544/apolloclient-v3-fetchmore-with-nested-query-results
 - [ ] add title to topic
 - [ ] git precommit
 - [ ] git hooks
