@@ -1,4 +1,10 @@
-import { MouseEvent, ChangeEvent, useState } from "react";
+import {
+  MouseEvent,
+  ChangeEvent,
+  useState,
+  useEffect,
+  forwardRef,
+} from "react";
 import Head from "next/head";
 import {
   Button,
@@ -8,6 +14,9 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Modal,
+  CircularProgress,
+  Chip,
 } from "@mui/material";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +27,7 @@ import addNoteStyles from "./add-note.module.scss";
 
 import { Header, Footer } from "../components";
 import {
+  APP_DATE_TIME_FORMAT,
   FORM_FIELD_INPUT_TYPES,
   FORM_FIELD_REPOSE_DIRECTION,
   FORM_FIELD_RESIZE_DIRECTION,
@@ -25,13 +35,18 @@ import {
   pageTitles,
 } from "../components/utils";
 import {
+  AppDispatch,
   InputModifyInfoType,
   RootState,
   addNewField,
+  clearTags,
+  fetchTagsByGroupId,
   fieldValueOnChange,
   removeField,
   repositionField,
   saveForm,
+  setInputModifyInProgress,
+  setModal,
   setRepositionElement,
   setResizeElement,
   setShowAddInputMenu,
@@ -53,8 +68,10 @@ const {
 } = iconComponents;
 
 export default function AddNote() {
-  const dispatch = useDispatch();
-  const addNoteStoreState = useSelector((state: RootState) => state.addNote);
+  const dispatch = useDispatch<AppDispatch>();
+  const addNoteStoreState = useSelector(
+    (state: RootState) => state.root.addNote,
+  );
 
   const { showAddInputMenu } = addNoteStoreState;
 
@@ -137,9 +154,16 @@ export default function AddNote() {
           color="primary"
           aria-label="add"
           className={addNoteStyles["floating-add-note-inputs"]}
-          onClick={() =>
-            dispatch(setShowAddInputMenu({ parentId: "", value: true }))
-          }
+          onClick={() => {
+            dispatch(setShowAddInputMenu({ value: true }));
+            dispatch(
+              setInputModifyInProgress({
+                parentId: "",
+                value: true,
+                type: "add-new-field",
+              }),
+            );
+          }}
         >
           <PlusIcon />
         </Fab>
@@ -147,10 +171,24 @@ export default function AddNote() {
           className={addNoteStyles["add-note-menu"]}
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={showAddInputMenu}
-          onClick={() =>
-            dispatch(setShowAddInputMenu({ parentId: "", value: false }))
-          }
+          onClick={() => {
+            dispatch(setShowAddInputMenu({ value: false }));
+            dispatch(
+              setInputModifyInProgress({
+                parentId: "",
+                value: false,
+                type: "",
+              }),
+            );
+          }}
         >
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => dispatch(setModal({ value: true }))}
+          >
+            Tags
+          </Button>
           <Button
             color="secondary"
             variant="contained"
@@ -195,6 +233,16 @@ export default function AddNote() {
             Save As Draft
           </Button>
         </Backdrop>
+
+        <Modal
+          aria-labelledby="unstyled-modal-title"
+          aria-describedby="unstyled-modal-description"
+          open={addNoteStoreState.showModal}
+          onClose={() => dispatch(setModal({ value: false }))}
+          className={addNoteStyles["add-note-modal"]}
+        >
+          <ModalTagsContainer />
+        </Modal>
       </main>
 
       <Footer />
@@ -227,13 +275,12 @@ const NoteCatcherFormField = ({
   siblingInputModifyInfo,
   value,
 }: NoteCatcherFormFieldType) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [style, setStyle] = useState({
     left: 50,
     width: 300,
   });
-  const [tags, setTags] = useState();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOnMenuClick = (event: MouseEvent<HTMLElement>) => {
@@ -305,25 +352,28 @@ const NoteCatcherFormField = ({
 
   const addChildElemToThisFormField = () => {
     handleClose();
-    dispatch(setShowAddInputMenu({ parentId: elemKey, value: true }));
+    dispatch(setShowAddInputMenu({ value: true }));
+    dispatch(
+      setInputModifyInProgress({
+        parentId: elemKey,
+        value: true,
+        type: "add-new-field",
+      }),
+    );
   };
 
-  const inputFieldOnChange = (
-    event: ChangeEvent<HTMLElement>,
-    type: string,
+  const inputFieldOnChange = (event: ChangeEvent<HTMLElement>) => {
+    const { value } = (event.target || event.currentTarget) as HTMLInputElement;
+    dispatch(fieldValueOnChange({ elemKey, value: value }));
+  };
+
+  const dateTimeFieldOnChange = (
+    currentlySelectedDateInfo: moment.Moment | null,
   ) => {
-    switch (type) {
-      case FORM_FIELD_INPUT_TYPES.INPUT:
-        {
-          const { value } = (event.target ||
-            event.currentTarget) as HTMLInputElement;
-          dispatch(fieldValueOnChange({ elemKey, value: value }));
-        }
+    if (currentlySelectedDateInfo) {
+      const value = currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
 
-        break;
-
-      default:
-        break;
+      dispatch(fieldValueOnChange({ elemKey, value: value }));
     }
   };
 
@@ -337,9 +387,7 @@ const NoteCatcherFormField = ({
             multiline
             fullWidth
             value={value}
-            onChange={(e) =>
-              inputFieldOnChange(e, FORM_FIELD_INPUT_TYPES.INPUT)
-            }
+            onChange={(e) => inputFieldOnChange(e)}
           />
         );
       }
@@ -347,10 +395,24 @@ const NoteCatcherFormField = ({
       case FORM_FIELD_INPUT_TYPES.IMAGE:
         return <CustomInputBox label={label} />;
 
-      case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
-        return (
-          <MobileDateTimePicker defaultValue={moment("2022-04-17T15:30")} />
-        );
+      case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME: {
+        if (value) {
+          const formatedDate = moment(value).format(APP_DATE_TIME_FORMAT);
+          return (
+            <MobileDateTimePicker
+              onAccept={dateTimeFieldOnChange}
+              defaultValue={moment(formatedDate)}
+            />
+          );
+        } else {
+          return (
+            <MobileDateTimePicker
+              onAccept={dateTimeFieldOnChange}
+              defaultValue={moment()}
+            />
+          );
+        }
+      }
 
       default:
         break;
@@ -539,3 +601,74 @@ const NoteCatcherFormField = ({
     </section>
   );
 };
+
+const ModalTagsContainer = forwardRef(
+  function ModalTagsContainerComponentFunc() {
+    const dispatch = useDispatch<AppDispatch>();
+    const tagseStoreState = useSelector((state: RootState) => state.root.tags);
+
+    useEffect(() => {
+      if (tagseStoreState.tags.length == 0)
+        dispatch(fetchTagsByGroupId("some group id"));
+    }, []);
+
+    return (
+      <section className={addNoteStyles["modal-content"]}>
+        <header>
+          <h2 id="unstyled-modal-title" className="modal-title">
+            Tags
+          </h2>
+        </header>
+        <section className={addNoteStyles["tags-searcher"]}>
+          <TextField
+            label="Search Tags"
+            variant="outlined"
+            fullWidth
+            color="secondary"
+            focused
+          />
+        </section>
+        <section className={addNoteStyles["tags-holder"]}>
+          {tagseStoreState.isLoading && (
+            <section className={addNoteStyles["loading-content"]}>
+              <CircularProgress color="inherit" />
+            </section>
+          )}
+          {tagseStoreState.tags.map((t) => {
+            const [key, value] = t;
+
+            return (
+              <Chip
+                className={addNoteStyles["chip-for-tags"]}
+                sx={{ color: "#fff" }}
+                key={key}
+                label={value}
+                variant="outlined"
+              />
+            );
+          })}
+        </section>
+        <footer>
+          {tagseStoreState.tags.length > 0 && (
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={() => dispatch(clearTags())}
+            >
+              clear
+            </Button>
+          )}
+          {tagseStoreState.tags.length == 0 && (
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={() => dispatch(fetchTagsByGroupId("some group id"))}
+            >
+              re-fetch
+            </Button>
+          )}
+        </footer>
+      </section>
+    );
+  },
+);

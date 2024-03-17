@@ -30,10 +30,19 @@ My personal notes managing app powered by AI
 - undo feature for deleting the input form fields in the note catcher
 
 # TODO
+- [ ] add apollo graphQl fetcher
+    - https://stackoverflow.com/questions/65127544/apolloclient-v3-fetchmore-with-nested-query-results
+    - use `ApolloProvider` and `useQuery` for react app
 - [ ] add title to topic
+- [ ] git precommit
+- [ ] git hooks
+- [ ] RTK query
 - [ ] add country field in input menu
     - it will be a dropdown
+- [ ] check the memo is required or not for following
+    - add note
 - [ ] add tags to main note and child elements
+- [ ] add image list from material ui for file uploads
 - [ ] save form data per field state in the redux store
 - [ ] save as draft and create new form
 - [ ] error boundary

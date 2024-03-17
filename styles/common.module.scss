@@ -11,7 +11,7 @@
 
 .container {
   --header-height: 80px;
-  --footer-height: 70px;
+  --footer-height: 50px;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -19,6 +19,7 @@
     height: calc(100% - var(--header-height) - var(--footer-height));
     p {
       text-align: center;
+      margin: 0;
     }
   }
   footer {

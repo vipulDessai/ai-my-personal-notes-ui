@@ -1,19 +1,34 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Alert, AlertTitle, Backdrop, CircularProgress } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Backdrop,
+  CircularProgress,
+  Snackbar,
+} from "@mui/material";
 
 import commonFeedback from "./common-feedback.module.scss";
 
-import { RootState } from "./stores";
-import { resetAlert } from "./stores/features/alert.slice";
+import {
+  AppDispatch,
+  RootState,
+  removeNotifications,
+  resetAlert,
+} from "./stores";
 
 export const CommonFeedbackComponents = () => {
-  const dispatch = useDispatch();
-  const showLoader = useSelector((state: RootState) => state.loader);
-  const alertData = useSelector((state: RootState) => state.alert);
+  const dispatch = useDispatch<AppDispatch>();
+  const showLoader = useSelector(
+    (state: RootState) => state.root.appFeed.loadingInProgress,
+  );
+  const alertData = useSelector((state: RootState) => state.root.appFeed.alert);
+  const snackBarNotifications = useSelector(
+    (state: RootState) => state.root.appFeed.notifications,
+  );
 
   return (
     <>
-      {showLoader.loadingInProgress && (
+      {showLoader && (
         <section className={commonFeedback["common-progress"]}>
           <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -39,6 +54,16 @@ export const CommonFeedbackComponents = () => {
           </Backdrop>
         </section>
       )}
+      {snackBarNotifications.length > 0 &&
+        snackBarNotifications.map((s, i) => (
+          <Snackbar
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            open={true}
+            onClose={() => dispatch(removeNotifications({ index: i }))}
+            message={s}
+            key={i}
+          />
+        ))}
     </>
   );
 };

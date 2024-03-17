@@ -7,31 +7,56 @@ import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
-import { pageTitles, getData, errorHandler } from "../components/utils";
-import { hideLoader, setError, showLoader } from "../components/stores";
+import {
+  pageTitles,
+  getData,
+  errorHandler,
+  postData,
+} from "../components/utils";
+import {
+  AppDispatch,
+  hideLoader,
+  setError,
+  showLoader,
+} from "../components/stores";
 
 export default function Home() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const defualtRetuarantnNamesValue: string[] = [];
-  const [restuarantNames, setRestuarantNames] = useState(
-    defualtRetuarantnNamesValue,
-  );
+  const [notes, setNotes] = useState(defualtRetuarantnNamesValue);
 
-  const makeApiCallTest = async () => {
+  const makeGraphQlLambdaCall = async () => {
     dispatch(showLoader());
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization:
+          "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI5ZDVmZjc4Mi05YWIxLTQ2YjQtYTAyNy1hYjVkZDQzN2U1ODQiLCJuYW1lIjoiaHJsZWFkZXJAZXhhbXBsZS5jb20iLCJyb2xlIjpbImhyIiwibGVhZGVyIl0sIm5iZiI6MTcxMDcwMDkwNywiZXhwIjoxNzE4NDc2OTA3LCJpYXQiOjE3MTA3MDA5MDcsImlzcyI6Imlzc3VlciIsImF1ZCI6ImF1ZGllbmNlIn0.xEyuIKjlRAiCrU45C_iks5LeZNOfcxDx5Yd6vWnjH0E",
+      };
+      const payload = `query getNote {
+        notes (input: {
+          batchSize: 10,
+        }) {
+          notes {
+            key
+            value {
+              title
+              tags
+              inputData {
+                value
+              }
+            }
+          }
+        }
+      }`;
       const res = await getData(
-        "https://oawjhv45uxgiecznjtfd5twnja0yuxtq.lambda-url.us-east-1.on.aws",
+        `${process.env.NEXT_PUBLIC_API_HOST}/graphql`,
+        payload,
+        headers,
       );
-      const resToArr = res.split(",");
 
-      const normalizedRestuarantsData: string[] = [];
-      for (let i = 0; i < resToArr.length && i < 10; i++) {
-        normalizedRestuarantsData.push(resToArr[i]);
-      }
-
-      setRestuarantNames(normalizedRestuarantsData);
+      console.log(res);
     } catch (error) {
       dispatch(setError(errorHandler(error)));
     }
@@ -50,11 +75,11 @@ export default function Home() {
       <main>
         <p>{pageTitles.HOME}</p>
         <section className={homePageStyles["api-call-tester"]}>
-          <Button variant="outlined" onClick={makeApiCallTest}>
-            API call
+          <Button variant="outlined" onClick={makeGraphQlLambdaCall}>
+            Get Notes
           </Button>
           <ul>
-            {restuarantNames.map((r, uniqueKey) => (
+            {notes.map((r, uniqueKey) => (
               <li key={uniqueKey}>{r}</li>
             ))}
           </ul>

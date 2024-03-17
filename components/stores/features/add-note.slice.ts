@@ -12,6 +12,7 @@ export interface InputFieldInfo {
   key: string;
   repositionElement: boolean;
   resizeElement: boolean;
+  tags: string[];
 }
 
 interface NoteCatcherFieldsHierarchy {
@@ -24,17 +25,19 @@ interface NoteCatcherFieldsHierarchy {
 export interface InputModifyInfoType {
   inProgress: boolean;
   elemKey: string;
-  actionType: "" | "resize" | "reposition" | "add-new-field";
+  actionType: "" | "resize" | "reposition" | "add-new-field" | "add-Tags";
 }
 
 interface AddNoteState {
   showAddInputMenu: boolean;
+  showModal: boolean;
   inputModifyInfo: InputModifyInfoType;
   formFields: NoteCatcherFieldsHierarchy[];
 }
 
-const initialState: AddNoteState = {
+export const initialState: AddNoteState = {
   showAddInputMenu: false,
+  showModal: false,
   inputModifyInfo: {
     inProgress: false,
     elemKey: "",
@@ -49,19 +52,39 @@ export const addNoteSlice = createSlice({
   reducers: {
     setShowAddInputMenu: (
       state,
-      action: PayloadAction<{ parentId: string; value: boolean }>,
+      action: PayloadAction<{
+        value: boolean;
+      }>,
     ) => {
-      const { parentId, value } = action.payload;
+      const { value } = action.payload;
+      state.showAddInputMenu = value;
+    },
+    setModal: (
+      state,
+      action: PayloadAction<{
+        value: boolean;
+      }>,
+    ) => {
+      const { value } = action.payload;
+      state.showModal = value;
+    },
+    setInputModifyInProgress: (
+      state,
+      action: PayloadAction<{
+        parentId: string;
+        value: boolean;
+        type: ReturnType<() => InputModifyInfoType["actionType"]>;
+      }>,
+    ) => {
+      const { parentId, value, type } = action.payload;
 
       if (value) {
-        state.showAddInputMenu = true;
         state.inputModifyInfo = {
-          actionType: "add-new-field",
+          actionType: type,
           elemKey: parentId,
           inProgress: true,
         };
       } else {
-        state.showAddInputMenu = false;
         state.inputModifyInfo = {
           actionType: "",
           elemKey: "",
@@ -89,6 +112,7 @@ export const addNoteSlice = createSlice({
                 type: FORM_FIELD_INPUT_TYPES.INPUT,
                 repositionElement: false,
                 resizeElement: false,
+                tags: [],
               },
               childFields: [],
               value: "",
@@ -106,6 +130,7 @@ export const addNoteSlice = createSlice({
                 type: FORM_FIELD_INPUT_TYPES.IMAGE,
                 repositionElement: false,
                 resizeElement: false,
+                tags: [],
               },
               childFields: [],
               value: "",
@@ -123,6 +148,7 @@ export const addNoteSlice = createSlice({
                 type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME,
                 repositionElement: false,
                 resizeElement: false,
+                tags: [],
               },
               childFields: [],
               value: "",
@@ -139,6 +165,7 @@ export const addNoteSlice = createSlice({
               type: FORM_FIELD_INPUT_TYPES.INPUT,
               repositionElement: false,
               resizeElement: false,
+              tags: [],
             },
             childFields: [],
             value: "",
@@ -362,6 +389,8 @@ export const addNoteSlice = createSlice({
 
 export const {
   setShowAddInputMenu,
+  setModal,
+  setInputModifyInProgress,
   addNewField,
   removeField,
   repositionField,

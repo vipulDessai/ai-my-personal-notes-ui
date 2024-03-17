@@ -12,6 +12,7 @@
     "lint:watch": "onchange \"./components/*\" \"./components/**/*\" \"./pages/*\" \"./pages/**/*\" -- npm run lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.9.7",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
@@ -20,6 +21,7 @@
     "@mui/x-date-pickers": "^6.19.0",
     "@reduxjs/toolkit": "^2.0.1",
     "axios": "^1.6.2",
+    "graphql": "^16.8.1",
     "moment": "^2.30.1",
     "next": "latest",
     "onchange": "^7.1.0",

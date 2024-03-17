@@ -1,29 +1,44 @@
-import { configureStore, Tuple } from "@reduxjs/toolkit";
+import { combineReducers, configureStore, Tuple } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { thunk } from "redux-thunk";
 
-import { counterSliceReducer } from "./features/counter.slice";
-import { alertSliceReducer } from "./features/alert.slice";
-import { commonLoaderSliceReducer } from "./features/loader.slice";
+import { appFeedbackSliceReducer } from "./features/feedback.slice";
 import { addNoteSliceReducer } from "./features/add-note.slice";
+import { tagsSliceReducer } from "./features/tags.slice";
+import { userSliceReducer } from "./features/user.slice";
 
-const persistConfig = {
+const combinedAsyncSlices = combineReducers({
+  addNote: persistReducer({ key: "add-note", storage }, addNoteSliceReducer),
+  tags: persistReducer(
+    {
+      key: "tags",
+      storage,
+    },
+    tagsSliceReducer,
+  ),
+  appFeed: appFeedbackSliceReducer,
+  user: persistReducer(
+    {
+      key: "user",
+      storage,
+    },
+    userSliceReducer,
+  ),
+});
+
+const rootPersistConfig = {
   key: "root",
   storage,
 };
-
-const persistedAddNoteSliceReducer = persistReducer(
-  persistConfig,
-  addNoteSliceReducer,
+const rootPersistReducer = persistReducer(
+  rootPersistConfig,
+  combinedAsyncSlices,
 );
 
 export const globalStore = configureStore({
   reducer: {
-    counter: counterSliceReducer,
-    alert: alertSliceReducer,
-    loader: commonLoaderSliceReducer,
-    addNote: persistedAddNoteSliceReducer,
+    root: rootPersistReducer,
   },
   // eslint-disable-next-line no-unused-vars
   middleware: (getDefaultMiddleware) => {
@@ -38,22 +53,22 @@ export type AppDispatch = typeof globalStore.dispatch;
 
 export const persistedGlobalStore = persistStore(globalStore);
 
-// dispatch events
 export {
-  decrement,
-  increment,
-  incrementByAmount,
-} from "./features/counter.slice";
-export {
+  showLoader,
+  hideLoader,
   setError,
   setInfo,
-  setWarning,
   setSuccess,
+  setWarning,
   resetAlert,
-} from "./features/alert.slice";
-export { showLoader, hideLoader } from "./features/loader.slice";
+  addNotifications,
+  removeNotifications,
+} from "./features/feedback.slice";
 export {
+  initialState,
   setShowAddInputMenu,
+  setModal,
+  setInputModifyInProgress,
   addNewField,
   removeField,
   repositionField,
@@ -63,3 +78,5 @@ export {
   saveForm,
   type InputModifyInfoType,
 } from "./features/add-note.slice";
+export { fetchTagsByGroupId, clearTags, getTags } from "./features/tags.slice";
+export { fetchAuthToken } from "./features/user.slice";
