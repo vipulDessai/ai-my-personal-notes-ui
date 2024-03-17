@@ -24,29 +24,7 @@ export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
 
   const defualtRetuarantnNamesValue: string[] = [];
-  const [restuarantNames, setRestuarantNames] = useState(
-    defualtRetuarantnNamesValue,
-  );
-
-  const makeApiCallTest = async () => {
-    dispatch(showLoader());
-    try {
-      const res = await getData(
-        "https://oawjhv45uxgiecznjtfd5twnja0yuxtq.lambda-url.us-east-1.on.aws",
-      );
-      const resToArr = res.split(",");
-
-      const normalizedRestuarantsData: string[] = [];
-      for (let i = 0; i < resToArr.length && i < 10; i++) {
-        normalizedRestuarantsData.push(resToArr[i]);
-      }
-
-      setRestuarantNames(normalizedRestuarantsData);
-    } catch (error) {
-      dispatch(setError(errorHandler(error)));
-    }
-    dispatch(hideLoader());
-  };
+  const [notes, setNotes] = useState(defualtRetuarantnNamesValue);
 
   const makeGraphQlLambdaCall = async () => {
     dispatch(showLoader());
@@ -54,20 +32,25 @@ export default function Home() {
       const headers = {
         "Content-Type": "application/json",
         Authorization:
-          "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIwYmFmMGU0Ni1jMTRjLTRhN2ItYTk2ZC02NjYyNGJkM2E0OGIiLCJuYW1lIjoiaHJsZWFkZXJAZXhhbXBsZS5jb20iLCJyb2xlIjpbImhyIiwibGVhZGVyIl0sIm5iZiI6MTcwNjE5MDIwNiwiZXhwIjoxNzEzOTY2MjA2LCJpYXQiOjE3MDYxOTAyMDYsImlzcyI6Imlzc3VlciIsImF1ZCI6ImF1ZGllbmNlIn0.i0MRrHBrAaXLYjafp6X6DkHQ_Fjxq-0TlJk4Q681K60",
+          "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI5ZDVmZjc4Mi05YWIxLTQ2YjQtYTAyNy1hYjVkZDQzN2U1ODQiLCJuYW1lIjoiaHJsZWFkZXJAZXhhbXBsZS5jb20iLCJyb2xlIjpbImhyIiwibGVhZGVyIl0sIm5iZiI6MTcxMDcwMDkwNywiZXhwIjoxNzE4NDc2OTA3LCJpYXQiOjE3MTA3MDA5MDcsImlzcyI6Imlzc3VlciIsImF1ZCI6ImF1ZGllbmNlIn0.xEyuIKjlRAiCrU45C_iks5LeZNOfcxDx5Yd6vWnjH0E",
       };
-      const payload = JSON.stringify({
-        query: `query getNote {
-          notes (input: {
-            batchSize: 10,
-          }) {
-            statusCode
-            body
+      const payload = `query getNote {
+        notes (input: {
+          batchSize: 10,
+        }) {
+          notes {
+            key
+            value {
+              title
+              tags
+              inputData {
+                value
+              }
+            }
           }
-        }`,
-        variables: {},
-      });
-      const res = await postData(
+        }
+      }`;
+      const res = await getData(
         `${process.env.NEXT_PUBLIC_API_HOST}/graphql`,
         payload,
         headers,
@@ -92,15 +75,11 @@ export default function Home() {
       <main>
         <p>{pageTitles.HOME}</p>
         <section className={homePageStyles["api-call-tester"]}>
-          <Button variant="outlined" onClick={makeApiCallTest}>
-            API call
-          </Button>
-          <br></br>
           <Button variant="outlined" onClick={makeGraphQlLambdaCall}>
-            GraphQL call
+            Get Notes
           </Button>
           <ul>
-            {restuarantNames.map((r, uniqueKey) => (
+            {notes.map((r, uniqueKey) => (
               <li key={uniqueKey}>{r}</li>
             ))}
           </ul>

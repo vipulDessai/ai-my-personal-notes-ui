@@ -1,8 +1,23 @@
 import axios from "axios";
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  gql,
+} from "@apollo/client";
 
-export const getData = async (url: string) => {
-  const r = await axios.get(url);
-  return r.data;
+export const getData = async (url: string, payload: any, headers?: any) => {
+  const client = new ApolloClient({
+    uri: url,
+    cache: new InMemoryCache(),
+    headers,
+  });
+
+  return client.query({
+    query: gql`
+      ${payload}
+    `,
+  });
 };
 
 export const postData = async <T>(url: string, payload: any, headers?: any) => {

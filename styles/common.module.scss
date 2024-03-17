@@ -19,6 +19,7 @@
     height: calc(100% - var(--header-height) - var(--footer-height));
     p {
       text-align: center;
+      margin: 0;
     }
   }
   footer {
