@@ -22,9 +22,14 @@ const { InboxIcon, MailIcon, MenuIcon, AccountCircleIcon } = iconComponents;
 export function SidePanel() {
   const router = useRouter();
   const [showSideMenu, setShowSideMenu] = useState(false);
-  const isLoading = useSelector(
-    (state: RootState) => state.root.user.isLoading,
-  );
+
+  // TODO: add the user slice back, once the apollo client and local storage retain
+  // issue is fixed
+  // const isLoading = useSelector(
+  //   (state: RootState) => state.root.user.isLoading,
+  // );
+
+  const isLoading = true;
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {

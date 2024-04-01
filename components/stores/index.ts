@@ -18,13 +18,15 @@ const combinedAsyncSlices = combineReducers({
     tagsSliceReducer,
   ),
   appFeed: appFeedbackSliceReducer,
-  user: persistReducer(
-    {
-      key: "user",
-      storage,
-    },
-    userSliceReducer,
-  ),
+  // TODO: add the user slice back, once the apollo client and local storage retain
+  // issue is fixed
+  // user: persistReducer(
+  //   {
+  //     key: "user",
+  //     storage,
+  //   },
+  //   userSliceReducer,
+  // ),
 });
 
 const rootPersistConfig = {

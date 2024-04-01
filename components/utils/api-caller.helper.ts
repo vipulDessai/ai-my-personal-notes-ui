@@ -1,44 +1,19 @@
-import axios from "axios";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  gql,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 
-export const getData = async (url: string, payload: any, headers?: any) => {
-  const client = new ApolloClient({
-    uri: url,
-    cache: new InMemoryCache(),
-    headers,
-  });
+// TDOO: setup the @apollo/client dev tools
+import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+if (true) {
+  // Adds messages only in a dev environment
+  loadDevMessages();
+  loadErrorMessages();
+}
 
-  return client.query({
-    query: gql`
-      ${payload}
-    `,
-  });
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: "",
 };
-
-export const postData = async <T>(url: string, payload: any, headers?: any) => {
-  let config = {
-    method: "post",
-    maxBodyLength: Infinity,
-    url,
-    headers,
-    data: payload,
-  };
-  const r = await axios.request<T>(config);
-  return r.data;
-};
-
-axios.interceptors.request.use(
-  (config) => {
-    // eslint-disable-next-line no-unused-vars
-    const { headers } = config;
-    return config;
-  },
-  (error) => {
-    Promise.reject(error);
-  },
-);
+export const apiConnector = new ApolloClient({
+  uri: process.env.NEXT_PUBLIC_API_HOST,
+  cache: new InMemoryCache(),
+  headers,
+});

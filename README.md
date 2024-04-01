@@ -31,8 +31,8 @@ My personal notes managing app powered by AI
 
 # TODO
 - [ ] add apollo graphQl fetcher
-    - https://stackoverflow.com/questions/65127544/apolloclient-v3-fetchmore-with-nested-query-results
-    - use `ApolloProvider` and `useQuery` for react app
+    - [ ] https://stackoverflow.com/questions/65127544/apolloclient-v3-fetchmore-with-nested-query-results
+    - [ ] use `ApolloProvider` and `useQuery` for react app - [link](https://www.apollographql.com/docs/react/get-started)
 - [ ] add title to topic
 - [ ] git precommit
 - [ ] git hooks

@@ -1,18 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import Head from "next/head";
 import { useDispatch } from "react-redux";
+import { useLazyQuery, gql } from "@apollo/client";
 
 import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
-import {
-  pageTitles,
-  getData,
-  errorHandler,
-  postData,
-} from "../components/utils";
+import { pageTitles, errorHandler } from "../components/utils";
 import {
   AppDispatch,
   hideLoader,
@@ -20,48 +16,48 @@ import {
   showLoader,
 } from "../components/stores";
 
-export default function Home() {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const defualtRetuarantnNamesValue: string[] = [];
-  const [notes, setNotes] = useState(defualtRetuarantnNamesValue);
-
-  const makeGraphQlLambdaCall = async () => {
-    dispatch(showLoader());
-    try {
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization:
-          "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI5ZDVmZjc4Mi05YWIxLTQ2YjQtYTAyNy1hYjVkZDQzN2U1ODQiLCJuYW1lIjoiaHJsZWFkZXJAZXhhbXBsZS5jb20iLCJyb2xlIjpbImhyIiwibGVhZGVyIl0sIm5iZiI6MTcxMDcwMDkwNywiZXhwIjoxNzE4NDc2OTA3LCJpYXQiOjE3MTA3MDA5MDcsImlzcyI6Imlzc3VlciIsImF1ZCI6ImF1ZGllbmNlIn0.xEyuIKjlRAiCrU45C_iks5LeZNOfcxDx5Yd6vWnjH0E",
-      };
-      const payload = `query getNote {
-        notes (input: {
-          batchSize: 10,
-        }) {
-          notes {
-            key
-            value {
-              title
-              tags
-              inputData {
-                value
-              }
-            }
+const GET_NOTES_QUERY = gql`
+  query getNoteInBatch($size: Int!) {
+    notes(input: { batchSize: $size }) {
+      notes {
+        key
+        value {
+          title
+          tags
+          inputData {
+            value
           }
         }
-      }`;
-      const res = await getData(
-        `${process.env.NEXT_PUBLIC_API_HOST}/graphql`,
-        payload,
-        headers,
-      );
+      }
+    }
+  }
+`;
 
-      console.log(res);
-    } catch (error) {
+export default function Home() {
+  const [getNotesLazy, { loading, error, data: getNotesRes }] =
+    useLazyQuery(GET_NOTES_QUERY);
+
+  useEffect(() => {
+    if (loading) dispatch(showLoader());
+    else dispatch(hideLoader());
+  }, [loading]);
+
+  useEffect(() => {
+    if (error) {
       dispatch(setError(errorHandler(error)));
     }
-    dispatch(hideLoader());
+  }, [error]);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const makeGraphQlLambdaCall = async () => {
+    getNotesLazy({ variables: { size: 10 } });
   };
+
+  let notes = [];
+  if (getNotesRes && getNotesRes.notes && getNotesRes.notes.notes) {
+    notes = getNotesRes.notes.notes;
+  }
 
   return (
     <div className={commonStyles.container}>
@@ -79,9 +75,11 @@ export default function Home() {
             Get Notes
           </Button>
           <ul>
-            {notes.map((r, uniqueKey) => (
-              <li key={uniqueKey}>{r}</li>
-            ))}
+            {notes.map((note: any) => {
+              const title = note.value.title;
+
+              return <li key={note.key}>{title}</li>;
+            })}
           </ul>
         </section>
       </main>

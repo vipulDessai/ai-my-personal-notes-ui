@@ -1,16 +1,20 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { gql, useMutation } from "@apollo/client";
 
 import hedearStyles from "./header.module.scss";
 
 import { SidePanel } from ".";
-import { svg } from "./utils";
+import { errorHandler, svg } from "./utils";
 import {
   AppDispatch,
   RootState,
   addNotifications,
   fetchAuthToken,
+  hideLoader,
+  setError,
+  showLoader,
 } from "./stores";
 
 // for more info on extend refer the https://stackoverflow.com/a/57706747/5720826 comment
@@ -23,34 +27,63 @@ const usePrevious = <T extends any>(value: T): T | undefined => {
   return ref.current;
 };
 
-export const Header = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const userAuthError = useSelector(
-    (state: RootState) => state.root.user.error,
-  );
+const GET_AUTH_TOKEN = gql`
+  mutation getToken($email: String!, $pwd: String!) {
+    token(email: $email, password: $pwd)
+  }
+`;
 
-  const prevUserAuthError = usePrevious(userAuthError);
+export const Header = () => {
+  const [getUserAuthToken, { data: authTokenData, loading, error }] =
+    useMutation(GET_AUTH_TOKEN);
 
   useEffect(() => {
-    if (prevUserAuthError) {
-      if (
-        userAuthError &&
-        userAuthError.message !== prevUserAuthError.message
-      ) {
-        const { message } = userAuthError;
-        dispatch(addNotifications(message));
-      }
-    } else {
-      if (userAuthError && userAuthError.message) {
-        const { message } = userAuthError;
-        dispatch(addNotifications(message));
-      }
+    if (loading) dispatch(showLoader());
+    else dispatch(hideLoader());
+  }, [loading]);
+
+  useEffect(() => {
+    if (error) {
+      dispatch(setError(errorHandler(error)));
     }
-  }, [userAuthError]);
+  }, [error]);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  // TODO: add the user slice back, once the apollo client and local storage retain
+  // issue is fixed
+  // const userAuthError = useSelector(
+  //   (state: RootState) => state.root.user.error,
+  // );
+  // const prevUserAuthError = usePrevious(userAuthError);
+  // useEffect(() => {
+  //   if (prevUserAuthError) {
+  //     if (
+  //       userAuthError &&
+  //       userAuthError.message !== prevUserAuthError.message
+  //     ) {
+  //       const { message } = userAuthError;
+  //       dispatch(addNotifications(message));
+  //     }
+  //   } else {
+  //     if (userAuthError && userAuthError.message) {
+  //       const { message } = userAuthError;
+  //       dispatch(addNotifications(message));
+  //     }
+  //   }
+  // }, [userAuthError]);
 
   useEffect(() => {
     const begin = async () => {
-      dispatch(fetchAuthToken());
+      getUserAuthToken({
+        variables: {
+          email: process.env.NEXT_PUBLIC_API_USER_ID,
+          pwd: process.env.NEXT_PUBLIC_API_USER_PWD,
+        },
+      });
+
+      // TODO: cache the user data using either redux or apollo
+      // dispatch(fetchAuthToken());
     };
 
     begin();

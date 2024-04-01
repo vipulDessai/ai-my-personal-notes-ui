@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { postData } from "../../utils";
 
 interface UserStateType {
   authToken: string | undefined;
@@ -24,7 +23,7 @@ export const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchAuthToken.fulfilled, (state, action) => {
-      state.authToken = action.payload.data?.token;
+      state.authToken = action.payload.token;
       state.isLoading = false;
     });
     builder.addCase(fetchAuthToken.pending, (state) => {
@@ -45,19 +44,13 @@ export const fetchAuthToken = createAsyncThunk(
     const headers = {
       "Content-Type": "application/json",
     };
-    const payload = JSON.stringify({
-      query: `mutation getTokenMutation {
-          token(
-            email: ${process.env.NEXT_PUBLIC_API_USER_ID}, 
-            password: ${process.env.NEXT_PUBLIC_API_USER_PWD}
-          )
-        }`,
-      variables: {},
+
+    return new Promise((res, rej) => {
+      res({
+        payload: {
+          data: {},
+        },
+      });
     });
-    return await postData<UserTokenRes>(
-      `${process.env.NEXT_PUBLIC_API_HOST}/graphql`,
-      payload,
-      headers,
-    );
   },
 );
