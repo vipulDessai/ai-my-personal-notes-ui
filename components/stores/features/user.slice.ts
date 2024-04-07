@@ -1,56 +1,40 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface UserStateType {
-  authToken: string | undefined;
   isLoading: boolean;
-  error: any;
-}
-interface UserTokenRes {
-  data: {
-    token: string;
-  };
+  error: string;
 }
 
 const initialState: UserStateType = {
-  authToken: "",
   isLoading: false,
-  error: null,
+  error: "",
 };
 
 export const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(fetchAuthToken.fulfilled, (state, action) => {
-      state.authToken = action.payload.token;
-      state.isLoading = false;
-    });
-    builder.addCase(fetchAuthToken.pending, (state) => {
-      state.isLoading = true;
-    });
-    builder.addCase(fetchAuthToken.rejected, (state, action) => {
-      state.error = action.error;
-      state.isLoading = false;
-    });
+  reducers: {
+    setUserIsLoading: (
+      state,
+      action: PayloadAction<{
+        value: boolean;
+      }>,
+    ) => {
+      const { value } = action.payload;
+      state.isLoading = value;
+    },
+    setUserDataError: (
+      state,
+      action: PayloadAction<{
+        value: string;
+      }>,
+    ) => {
+      const { value } = action.payload;
+      state.error = value;
+    },
   },
 });
 
 export const userSliceReducer = userSlice.reducer;
 
-export const fetchAuthToken = createAsyncThunk(
-  "user/authenticate",
-  async () => {
-    const headers = {
-      "Content-Type": "application/json",
-    };
-
-    return new Promise((res, rej) => {
-      res({
-        payload: {
-          data: {},
-        },
-      });
-    });
-  },
-);
+export const { setUserDataError, setUserIsLoading } = userSlice.actions;

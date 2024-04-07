@@ -23,13 +23,9 @@ export function SidePanel() {
   const router = useRouter();
   const [showSideMenu, setShowSideMenu] = useState(false);
 
-  // TODO: add the user slice back, once the apollo client and local storage retain
-  // issue is fixed
-  // const isLoading = useSelector(
-  //   (state: RootState) => state.root.user.isLoading,
-  // );
-
-  const isLoading = true;
+  const isLoading = useSelector(
+    (state: RootState) => state.root.user.isLoading,
+  );
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {

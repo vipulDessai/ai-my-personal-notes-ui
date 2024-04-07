@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@mui/material";
 import Head from "next/head";
 import { useDispatch } from "react-redux";
