@@ -6,7 +6,7 @@ import { gql, useMutation } from "@apollo/client";
 import hedearStyles from "./header.module.scss";
 
 import { SidePanel } from ".";
-import { errorHandler, svg } from "./utils";
+import { GENERAL_KEYS, GetUserAuthData, errorHandler, svg } from "./utils";
 import {
   AppDispatch,
   RootState,
@@ -35,11 +35,15 @@ const GET_AUTH_TOKEN = gql`
 
 export const Header = () => {
   const [getUserAuthToken, { data: authTokenData, loading, error }] =
-    useMutation(GET_AUTH_TOKEN);
+    useMutation<GetUserAuthData>(GET_AUTH_TOKEN);
 
   useEffect(() => {
     if (loading) dispatch(showLoader());
-    else dispatch(hideLoader());
+    else {
+      dispatch(hideLoader());
+      if (authTokenData)
+        localStorage.setItem(GENERAL_KEYS.APP_API_TOKEN, authTokenData.token);
+    }
   }, [loading]);
 
   useEffect(() => {

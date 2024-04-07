@@ -22,3 +22,7 @@ export const FORM_FIELD_INPUT_TYPES = {
 };
 
 export const APP_DATE_TIME_FORMAT = "YYYY-MM-DDTHH:mm";
+
+export const GENERAL_KEYS = {
+  APP_API_TOKEN: "app-api-token",
+};
