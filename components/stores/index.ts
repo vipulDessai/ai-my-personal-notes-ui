@@ -54,8 +54,6 @@ export type AppDispatch = typeof globalStore.dispatch;
 export const persistedGlobalStore = persistStore(globalStore);
 
 export {
-  showLoader,
-  hideLoader,
   setError,
   setInfo,
   setSuccess,

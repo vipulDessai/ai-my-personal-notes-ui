@@ -1,20 +1,19 @@
 import { useEffect } from "react";
-import { Button } from "@mui/material";
+import {
+  CircularProgress,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import Head from "next/head";
-import { useDispatch } from "react-redux";
 import { useLazyQuery, gql } from "@apollo/client";
 
 import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
-import { pageTitles, errorHandler } from "../components/utils";
-import {
-  AppDispatch,
-  hideLoader,
-  setError,
-  showLoader,
-} from "../components/stores";
+import { pageTitles } from "../components/utils";
 
 const GET_NOTES_QUERY = gql`
   query getNoteInBatch($size: Int!) {
@@ -34,25 +33,16 @@ const GET_NOTES_QUERY = gql`
 `;
 
 export default function Home() {
-  const [getNotesLazy, { loading, error, data: getNotesRes }] =
+  const [getNotesLazy, { data: getNotesRes, loading, error }] =
     useLazyQuery(GET_NOTES_QUERY);
-
-  useEffect(() => {
-    if (loading) dispatch(showLoader());
-    else dispatch(hideLoader());
-  }, [loading]);
-
-  useEffect(() => {
-    if (error) {
-      dispatch(setError(errorHandler(error)));
-    }
-  }, [error]);
-
-  const dispatch = useDispatch<AppDispatch>();
 
   const makeGraphQlLambdaCall = async () => {
     getNotesLazy({ variables: { size: 10 } });
   };
+
+  useEffect(() => {
+    makeGraphQlLambdaCall();
+  }, []);
 
   let notes = [];
   if (getNotesRes && getNotesRes.notes && getNotesRes.notes.notes) {
@@ -69,18 +59,31 @@ export default function Home() {
       <Header />
 
       <main>
-        <p>{pageTitles.HOME}</p>
         <section className={homePageStyles["api-call-tester"]}>
-          <Button variant="outlined" onClick={makeGraphQlLambdaCall}>
-            Get Notes
-          </Button>
-          <ul>
-            {notes.map((note: any) => {
-              const title = note.value.title;
+          {loading && <CircularProgress color="inherit" />}
+          {error?.message}
+          {notes.length > 0 && (
+            <List
+              sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+            >
+              {notes.map((note: any) => {
+                const { title, tags } = note.value;
 
-              return <li key={note.key}>{title}</li>;
-            })}
-          </ul>
+                return (
+                  <>
+                    <ListItem alignItems="flex-start">
+                      <ListItemText
+                        key={note.key}
+                        primary={title}
+                        secondary={tags.join()}
+                      />
+                    </ListItem>
+                    <Divider variant="inset" component="li" />
+                  </>
+                );
+              })}
+            </List>
+          )}
         </section>
       </main>
 

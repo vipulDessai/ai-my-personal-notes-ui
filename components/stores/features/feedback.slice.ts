@@ -32,12 +32,6 @@ export const appFeedbackSlice = createSlice({
   name: "app-feedback",
   initialState,
   reducers: {
-    showLoader: (state) => {
-      state.loadingInProgress = true;
-    },
-    hideLoader: (state) => {
-      state.loadingInProgress = false;
-    },
     setError: (state, action: PayloadAction<alertStatePayload>) => {
       state.alert = {
         type: "error",
@@ -75,8 +69,6 @@ export const appFeedbackSlice = createSlice({
 });
 
 export const {
-  showLoader,
-  hideLoader,
   setError,
   setInfo,
   setWarning,
