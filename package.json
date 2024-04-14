@@ -4,12 +4,14 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "pretty": "prettier --write .eslintrc.json next.config.js next-env.d.ts jest.config.ts ./__tests__/* ./__tests__/**/* ./__mocks__/* ./__mocks__/**/* ./components/* ./components/**/* ./styles/* ./styles/**/* ./pages/* ./pages/**/* --ignore-unknown",
-    "prettier:watch": "onchange .eslintrc.json next.config.js next-env.d.ts jest.config.ts \"./__tests__/*\" \"./__tests__/**/*\" \"./__mocks__/*\" \"./__mocks__/**/*\" \"./components/*\" \"./components/**/*\" \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}",
+    "pretty": "prettier --write codegen.ts .eslintrc.json next.config.js next-env.d.ts jest.config.ts ./__tests__/* ./__tests__/**/* ./__mocks__/* ./__mocks__/**/* ./components/* ./components/**/* ./styles/* ./styles/**/* ./pages/* ./pages/**/* --ignore-unknown",
+    "prettier:watch": "onchange codegen.ts .eslintrc.json next.config.js next-env.d.ts jest.config.ts \"./__tests__/*\" \"./__tests__/**/*\" \"./__mocks__/*\" \"./__mocks__/**/*\" \"./components/*\" \"./components/**/*\" \"./styles/*\" \"./styles/**/*\" \"./pages/*\" \"./pages/**/*\" -- prettier --write --ignore-unknown {{changed}}",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "next lint",
-    "lint:watch": "onchange \"./components/*\" \"./components/**/*\" \"./pages/*\" \"./pages/**/*\" -- npm run lint"
+    "lint:watch": "onchange \"./components/*\" \"./components/**/*\" \"./pages/*\" \"./pages/**/*\" -- npm run lint",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts -w"
   },
   "dependencies": {
     "@apollo/client": "^3.9.7",
@@ -36,6 +38,12 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/client-preset": "4.2.5",
+    "@graphql-codegen/introspection": "4.0.3",
+    "@graphql-codegen/typescript": "^4.0.6",
+    "@graphql-codegen/typescript-resolvers": "^4.0.6",
+    "@parcel/watcher": "^2.4.1",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@types/jest": "^29.5.11",

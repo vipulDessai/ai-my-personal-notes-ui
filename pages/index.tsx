@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import {
+  Chip,
   CircularProgress,
   Divider,
   List,
@@ -7,7 +8,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import Head from "next/head";
-import { useLazyQuery, gql } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 
 import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
@@ -15,9 +16,11 @@ import homePageStyles from "./index.module.scss";
 import { Header, Footer } from "../components";
 import { pageTitles } from "../components/utils";
 
-const GET_NOTES_QUERY = gql`
-  query getNoteInBatch($size: Int!) {
-    notes(input: { batchSize: $size }) {
+import { gql } from "../gql";
+
+const GET_NOTES_QUERY = gql(`
+  query getNoteInBatch($size: Int!, $page: Int!) {
+    notes(input: { batchSize: $size, page: $page }) {
       notes {
         key
         value {
@@ -30,24 +33,21 @@ const GET_NOTES_QUERY = gql`
       }
     }
   }
-`;
+`);
 
 export default function Home() {
   const [getNotesLazy, { data: getNotesRes, loading, error }] =
     useLazyQuery(GET_NOTES_QUERY);
 
   const makeGraphQlLambdaCall = async () => {
-    getNotesLazy({ variables: { size: 10 } });
+    getNotesLazy({ variables: { size: 10, page: 0 } });
   };
 
   useEffect(() => {
     makeGraphQlLambdaCall();
   }, []);
 
-  let notes = [];
-  if (getNotesRes && getNotesRes.notes && getNotesRes.notes.notes) {
-    notes = getNotesRes.notes.notes;
-  }
+  const notes = getNotesRes && getNotesRes.notes && getNotesRes.notes.notes;
 
   return (
     <div className={commonStyles.container}>
@@ -62,11 +62,11 @@ export default function Home() {
         <section className={homePageStyles["api-call-tester"]}>
           {loading && <CircularProgress color="inherit" />}
           {error?.message}
-          {notes.length > 0 && (
+          {notes && notes.length > 0 && (
             <List
               sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
             >
-              {notes.map((note: any) => {
+              {notes.map((note) => {
                 const { title, tags } = note.value;
 
                 return (
@@ -75,7 +75,9 @@ export default function Home() {
                       <ListItemText
                         key={note.key}
                         primary={title}
-                        secondary={tags.join()}
+                        secondary={tags?.map((t) => (
+                          <Chip label={t} variant="outlined" />
+                        ))}
                       />
                     </ListItem>
                     <Divider variant="inset" component="li" />
