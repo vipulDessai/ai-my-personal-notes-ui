@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import {
   Chip,
   CircularProgress,
-  Divider,
   List,
   ListItem,
   ListItemText,
@@ -14,7 +13,7 @@ import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
-import { pageTitles } from "../components/utils";
+import { pageTitles, toDictionary } from "../components/utils";
 
 import { gql } from "../gql";
 
@@ -26,6 +25,8 @@ const GET_NOTES_QUERY = gql(`
         value {
           title
           tags
+          date
+          updatedDate
           inputData {
             value
           }
@@ -79,17 +80,16 @@ export default function Home() {
 
       if (tagsIds) getNotesTagsLazy({ variables: { tagsIds } });
     }
-  }, [loadingNotes]);
-
-  const makeGraphQlLambdaCall = async () => {
-    getNotesLazy({ variables: { size: 10, page: 0 } });
-  };
+  }, [loadingNotes, getNotesRes, getNotesTagsLazy]);
 
   useEffect(() => {
-    makeGraphQlLambdaCall();
-  }, []);
+    getNotesLazy({ variables: { size: 10, page: 0 } });
+  }, [getNotesLazy]);
 
-  const notes = getNotesRes && getNotesRes.notes && getNotesRes.notes.notes;
+  const notes = getNotesRes?.notes?.notes;
+
+  const tagsData = getNotesTagRes?.tags?.tags || [];
+  const tagsDataDictionary = toDictionary(tagsData, "key", "value");
 
   return (
     <div className={commonStyles.container}>
@@ -103,11 +103,13 @@ export default function Home() {
       <main>
         <section className={homePageStyles["api-call-tester"]}>
           {loadingNotes && <CircularProgress color="inherit" />}
-          {getNotesError?.message}
+          {/* TODO: properly show the error */}
+          {getNotesError?.message && <p>{getNotesError.message}</p>}
+          {getTagsError?.message && <p>{getTagsError.message}</p>}
           {notes && notes.length > 0 && (
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
               {notes.map((note) => {
-                const { title, tags: tagIds } = note.value;
+                const { title, tags: tagsIds, date, updatedDate } = note.value;
 
                 return (
                   <ListItem
@@ -115,6 +117,20 @@ export default function Home() {
                     sx={{ flexDirection: "column", alignItems: "baseline" }}
                     divider={true}
                   >
+                    <List
+                      sx={{
+                        width: "100%",
+                        bgcolor: "background.paper",
+                        display: "flex",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <ListItemText
+                        key={note.key}
+                        primary={date}
+                        // secondary={updatedDate}
+                      />
+                    </List>
                     <ListItemText key={note.key} primary={title} />
                     <List
                       sx={{
@@ -124,9 +140,16 @@ export default function Home() {
                         flexWrap: "wrap",
                       }}
                     >
-                      {tagIds?.map((t) => (
-                        <Chip key={t} label={t} variant="outlined" />
-                      ))}
+                      {loadingTags && <CircularProgress color="inherit" />}
+                      {!loadingTags &&
+                        tagsData &&
+                        tagsIds?.map((tagId) => (
+                          <Chip
+                            key={tagId}
+                            label={tagsDataDictionary[tagId]?.name}
+                            variant="outlined"
+                          />
+                        ))}
                     </List>
                   </ListItem>
                 );

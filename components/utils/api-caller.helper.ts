@@ -1,14 +1,16 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
-// TDOO: setup the @apollo/client dev tools
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { GENERAL_KEYS } from "./constant";
-if (true) {
-  // Adds messages only in a dev environment
-  loadDevMessages();
-  loadErrorMessages();
-}
+
+// TDOO: setup the @apollo/client dev tools
+// import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+
+// if (true) {
+//   // Adds messages only in a dev environment
+//   loadDevMessages();
+//   loadErrorMessages();
+// }
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_API_HOST + "/graphql",

@@ -10,4 +10,4 @@ export { errorHandler } from "./reponse-handler.helper";
 export { apiConnector } from "./api-caller.helper";
 export type { GetUserAuthData } from "./api-caller.helper";
 export { iconComponents, svg } from "./icons";
-export { generateUUID } from "./common.helper";
+export { generateUUID, toDictionary } from "./common.helper";

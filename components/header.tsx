@@ -23,11 +23,13 @@ const GET_AUTH_TOKEN = gql`
 export const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [getUserAuthToken, { data: authTokenData, loading, error }] =
-    useMutation<GetUserAuthData>(GET_AUTH_TOKEN);
+  const [
+    getUserAuthToken,
+    { data: authTokenData, loading: userLoading, error: userAuthFetchError },
+  ] = useMutation<GetUserAuthData>(GET_AUTH_TOKEN);
 
   useEffect(() => {
-    if (loading) {
+    if (userLoading) {
       dispatch(setUserIsLoading({ value: true }));
     } else {
       dispatch(setUserIsLoading({ value: false }));
@@ -35,17 +37,17 @@ export const Header = () => {
         localStorage.setItem(GENERAL_KEYS.APP_API_TOKEN, authTokenData.token);
       }
     }
-  }, [loading]);
+  }, [userLoading, dispatch, authTokenData]);
 
   useEffect(() => {
-    if (error) {
-      const { message } = errorHandler(error);
+    if (userAuthFetchError) {
+      const { message } = errorHandler(userAuthFetchError);
       // component level error notification
       dispatch(setUserDataError({ value: message }));
       // global notification too
       dispatch(addNotifications(message));
     }
-  }, [error]);
+  }, [userAuthFetchError, dispatch]);
 
   useEffect(() => {
     const begin = async () => {
@@ -63,7 +65,7 @@ export const Header = () => {
     };
 
     begin();
-  }, []);
+  }, [getUserAuthToken]);
 
   return (
     <header className={hedearStyles["app-main-header"]}>
