@@ -73,7 +73,7 @@ export default function Home() {
       for (let i = 0; i < notes.length; ++i) {
         const curNote = notes[i].value;
         if (curNote.tags) {
-          tagsIds = [...curNote.tags];
+          tagsIds = [...tagsIds, ...curNote.tags];
         }
       }
 
@@ -105,25 +105,30 @@ export default function Home() {
           {loadingNotes && <CircularProgress color="inherit" />}
           {getNotesError?.message}
           {notes && notes.length > 0 && (
-            <List
-              sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
-            >
+            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
               {notes.map((note) => {
                 const { title, tags: tagIds } = note.value;
 
                 return (
-                  <>
-                    <ListItem alignItems="flex-start">
-                      <ListItemText
-                        key={note.key}
-                        primary={title}
-                        secondary={tagIds?.map((t) => (
-                          <Chip label={t} variant="outlined" />
-                        ))}
-                      />
-                    </ListItem>
-                    <Divider variant="inset" component="li" />
-                  </>
+                  <ListItem
+                    key={note.key}
+                    sx={{ flexDirection: "column", alignItems: "baseline" }}
+                    divider={true}
+                  >
+                    <ListItemText key={note.key} primary={title} />
+                    <List
+                      sx={{
+                        width: "100%",
+                        bgcolor: "background.paper",
+                        display: "flex",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {tagIds?.map((t) => (
+                        <Chip key={t} label={t} variant="outlined" />
+                      ))}
+                    </List>
+                  </ListItem>
                 );
               })}
             </List>

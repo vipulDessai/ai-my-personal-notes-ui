@@ -10,8 +10,8 @@
     "test:watch": "jest --watch",
     "lint": "next lint",
     "lint:watch": "onchange \"./components/*\" \"./components/**/*\" \"./pages/*\" \"./pages/**/*\" -- npm run lint",
-    "codegen": "graphql-codegen --config codegen.ts",
-    "codegen:watch": "graphql-codegen --config codegen.ts -w"
+    "gqlgen": "graphql-codegen --config codegen.ts",
+    "gqlgen:watch": "graphql-codegen --config codegen.ts -w"
   },
   "dependencies": {
     "@apollo/client": "^3.9.7",
@@ -31,7 +31,6 @@
     "react-dom": "18.2.0",
     "react-redux": "^9.0.4",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^3.1.0",
     "uuid": "^9.0.1"
   },
   "engines": {

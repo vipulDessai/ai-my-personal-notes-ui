@@ -76,5 +76,5 @@ export {
   saveForm,
   type InputModifyInfoType,
 } from "./features/add-note.slice";
-export { fetchTagsByGroupId, clearTags, getTags } from "./features/tags.slice";
+export { clearTags, getTags } from "./features/tags.slice";
 export { setUserDataError, setUserIsLoading } from "./features/user.slice";

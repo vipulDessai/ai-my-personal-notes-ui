@@ -40,7 +40,6 @@ import {
   RootState,
   addNewField,
   clearTags,
-  fetchTagsByGroupId,
   fieldValueOnChange,
   removeField,
   repositionField,
@@ -608,8 +607,9 @@ const ModalTagsContainer = forwardRef(
     const tagseStoreState = useSelector((state: RootState) => state.root.tags);
 
     useEffect(() => {
-      if (tagseStoreState.tags.length == 0)
-        dispatch(fetchTagsByGroupId("some group id"));
+      if (tagseStoreState.tags.length == 0) {
+        // TODO: get tags
+      }
     }, []);
 
     return (
@@ -662,7 +662,9 @@ const ModalTagsContainer = forwardRef(
             <Button
               color="secondary"
               variant="contained"
-              onClick={() => dispatch(fetchTagsByGroupId("some group id"))}
+              onClick={() => {
+                /** TODO: get tags */
+              }}
             >
               re-fetch
             </Button>
