@@ -21,6 +21,7 @@ import {
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
+import { useMutation } from "@apollo/client";
 
 import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
@@ -51,6 +52,7 @@ import {
   setShowAddInputMenu,
 } from "../components/stores";
 import { CustomInputBox } from "../components/elements";
+import { gql } from "../gql";
 
 const {
   PlusIcon,
@@ -66,13 +68,67 @@ const {
   DoneIcon,
 } = iconComponents;
 
+const ADD_NOTE = gql(`
+  mutation addNote(
+    $newTags: [NoteTagsInput!]!, $title: String, $date: DateTime!, $primaryTags: [String!], $inputData: [NoteInputsInput!]) {
+    updateNote (input: {
+      note: {
+        inputData: $inputData,
+        tags: $primaryTags,
+        title: $title,
+        date: $date
+      }
+      newTags: $newTags
+    }) {
+      message
+    }
+  }
+`);
+
 export default function AddNote() {
+  const [
+    addTodo,
+    {
+      data: noteAddedStatus,
+      loading: addNoteAPICallLoading,
+      error: addNoteError,
+    },
+  ] = useMutation(ADD_NOTE);
+
   const dispatch = useDispatch<AppDispatch>();
   const addNoteStoreState = useSelector(
     (state: RootState) => state.root.addNote,
   );
 
   const { showAddInputMenu } = addNoteStoreState;
+
+  const saveNote = () => {
+    const tags = [];
+    addTodo({
+      variables: {
+        newTags: tags,
+        primaryTags: ["65da416ffc087bb42910b950", "65da416ffc087bb42910b951"],
+        date: "2024-02-11T00:00:00",
+        title: "india is heading towards big election on 26 april 2024",
+        inputData: {
+          value: "c1",
+          childInputs: [
+            {
+              value: "c 1 1",
+              childInputs: [
+                {
+                  value: "c 1 1 1",
+                  tags: ["65da416ffc087bb42910b951"],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    dispatch(saveForm());
+  };
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
@@ -148,11 +204,15 @@ export default function AddNote() {
           <section className={addNoteStyles["note-pad-overflow-content"]}>
             {constructedformFieldComponents}
           </section>
+          <section className={addNoteStyles["lazy-loader-save-notes"]}>
+            {addNoteAPICallLoading && <CircularProgress color="inherit" />}
+          </section>
         </section>
+
         <Fab
           color="primary"
           aria-label="add"
-          className={addNoteStyles["floating-add-note-inputs"]}
+          className={commonStyles["floating-fab-bottom"]}
           onClick={() => {
             dispatch(setShowAddInputMenu({ value: true }));
             dispatch(
@@ -217,11 +277,7 @@ export default function AddNote() {
           >
             Date Time
           </Button>
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => dispatch(saveForm())}
-          >
+          <Button color="secondary" variant="contained" onClick={saveNote}>
             Save
           </Button>
           <Button

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import {
   Chip,
   CircularProgress,
+  Fab,
   List,
   ListItem,
   ListItemText,
@@ -13,7 +14,9 @@ import commonStyles from "../styles/common.module.scss";
 import homePageStyles from "./index.module.scss";
 
 import { Header, Footer } from "../components";
-import { pageTitles, toDictionary } from "../components/utils";
+import { pageTitles, toDictionary, iconComponents } from "../components/utils";
+
+const { SearchIcon } = iconComponents;
 
 import { gql } from "../gql";
 
@@ -101,8 +104,7 @@ export default function Home() {
       <Header />
 
       <main>
-        <section className={homePageStyles["api-call-tester"]}>
-          {loadingNotes && <CircularProgress color="inherit" />}
+        <section className={homePageStyles["notes-holder"]}>
           {/* TODO: properly show the error */}
           {getNotesError?.message && <p>{getNotesError.message}</p>}
           {getTagsError?.message && <p>{getTagsError.message}</p>}
@@ -156,7 +158,18 @@ export default function Home() {
               })}
             </List>
           )}
+          <section className={homePageStyles["lazy-loader-notes"]}>
+            {loadingNotes && <CircularProgress color="inherit" />}
+          </section>
         </section>
+        <Fab
+          color="primary"
+          aria-label="add"
+          className={commonStyles["floating-fab-bottom"]}
+          onClick={() => {}}
+        >
+          <SearchIcon />
+        </Fab>
       </main>
 
       <Footer />

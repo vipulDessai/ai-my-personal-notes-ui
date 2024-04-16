@@ -1,3 +1,7 @@
-.api-call-tester {
-  text-align: center;
+.notes-holder {
+  height: 100%;
+  overflow: auto;
+  section.lazy-loader-notes {
+    text-align: center;
+  }
 }
