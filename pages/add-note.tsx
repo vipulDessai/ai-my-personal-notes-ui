@@ -40,6 +40,7 @@ import {
   InputModifyInfoType,
   RootState,
   addNewField,
+  addNotifications,
   clearTags,
   fieldValueOnChange,
   removeField,
@@ -85,7 +86,15 @@ const ADD_NOTE = gql(`
   }
 `);
 
+interface NoteInputsInput {
+  value?: string;
+  childInputs?: NoteInputsInput[];
+  tags?: string[];
+}
+
 export default function AddNote() {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [
     addTodo,
     {
@@ -95,7 +104,18 @@ export default function AddNote() {
     },
   ] = useMutation(ADD_NOTE);
 
-  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    if (noteAddedStatus && noteAddedStatus.updateNote) {
+      dispatch(addNotifications(noteAddedStatus.updateNote.message));
+    }
+  }, [noteAddedStatus, dispatch]);
+
+  useEffect(() => {
+    if (addNoteError) {
+      dispatch(addNotifications(addNoteError.message));
+    }
+  }, [addNoteError, dispatch]);
+
   const addNoteStoreState = useSelector(
     (state: RootState) => state.root.addNote,
   );
@@ -103,27 +123,36 @@ export default function AddNote() {
   const { showAddInputMenu } = addNoteStoreState;
 
   const saveNote = () => {
-    const tags = [];
+    const recursivelyFormInputData = (
+      allFormFields: ReturnType<() => typeof addNoteStoreState.formFields>,
+    ) => {
+      if (!allFormFields) return [];
+
+      const normalizedInputdata: NoteInputsInput[] = [];
+      for (let i = 0; i < allFormFields.length; ++i) {
+        const curFormFieldData = allFormFields[i];
+
+        const curNoteInput: NoteInputsInput = {
+          value: curFormFieldData.value,
+          childInputs: recursivelyFormInputData(curFormFieldData.childFields),
+          tags: curFormFieldData.meta.tags,
+        };
+
+        normalizedInputdata.push(curNoteInput);
+      }
+
+      return normalizedInputdata;
+    };
+
+    const inputData = recursivelyFormInputData(addNoteStoreState.formFields);
+
     addTodo({
       variables: {
-        newTags: tags,
-        primaryTags: ["65da416ffc087bb42910b950", "65da416ffc087bb42910b951"],
-        date: "2024-02-11T00:00:00",
-        title: "india is heading towards big election on 26 april 2024",
-        inputData: {
-          value: "c1",
-          childInputs: [
-            {
-              value: "c 1 1",
-              childInputs: [
-                {
-                  value: "c 1 1 1",
-                  tags: ["65da416ffc087bb42910b951"],
-                },
-              ],
-            },
-          ],
-        },
+        newTags: addNoteStoreState.newTags.map((t) => ({ name: t })),
+        primaryTags: addNoteStoreState.allTags,
+        date: addNoteStoreState.date,
+        title: addNoteStoreState.title,
+        inputData,
       },
     });
 
@@ -200,14 +229,40 @@ export default function AddNote() {
       <Header />
 
       <main className={addNoteStyles["note-catcher"]}>
-        <section className={addNoteStyles["note-pad"]}>
-          <section className={addNoteStyles["note-pad-overflow-content"]}>
-            {constructedformFieldComponents}
-          </section>
-          <section className={addNoteStyles["lazy-loader-save-notes"]}>
-            {addNoteAPICallLoading && <CircularProgress color="inherit" />}
-          </section>
+        <section className={addNoteStyles["basic-details"]}>
+          <TextField
+            label={"title"}
+            multiline
+            fullWidth
+            value={""}
+            onChange={() => {}}
+          />
+          <MobileDateTimePicker
+            sx={{ marginTop: "8px" }}
+            onAccept={() => {}}
+            defaultValue={moment()}
+          />
         </section>
+        {constructedformFieldComponents.length > 0 && (
+          <section className={addNoteStyles["note-pad"]}>
+            <section className={addNoteStyles["note-pad-overflow-content"]}>
+              {constructedformFieldComponents}
+            </section>
+            <section className={addNoteStyles["lazy-loader-save-notes"]}>
+              {addNoteAPICallLoading && <CircularProgress color="inherit" />}
+            </section>
+          </section>
+        )}
+        {constructedformFieldComponents.length === 0 && (
+          <section className={addNoteStyles["add-inputs-message"]}>
+            <ul>
+              <li>
+                <PlusIcon />
+              </li>
+              <li>Please add inputs by clicking on below button</li>
+            </ul>
+          </section>
+        )}
 
         <Fab
           color="primary"
@@ -666,7 +721,7 @@ const ModalTagsContainer = forwardRef(
       if (tagseStoreState.tags.length == 0) {
         // TODO: get tags
       }
-    }, []);
+    }, [tagseStoreState]);
 
     return (
       <section className={addNoteStyles["modal-content"]}>

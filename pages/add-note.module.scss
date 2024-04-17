@@ -1,5 +1,11 @@
 .note-catcher {
   position: relative;
+  .basic-details {
+    width: 80%;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 10px;
+  }
   .note-pad {
     position: relative;
     height: 100%;
@@ -69,6 +75,12 @@
   }
   .lazy-loader-save-notes {
     text-align: center;
+  }
+  .add-inputs-message {
+    text-align: center;
+    ul {
+      margin: 0;
+    }
   }
 }
 

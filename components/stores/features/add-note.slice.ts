@@ -33,6 +33,10 @@ interface AddNoteState {
   showModal: boolean;
   inputModifyInfo: InputModifyInfoType;
   formFields: NoteCatcherFieldsHierarchy[];
+  title: string;
+  date: string;
+  allTags: string[];
+  newTags: string[];
 }
 
 export const initialState: AddNoteState = {
@@ -44,6 +48,10 @@ export const initialState: AddNoteState = {
     actionType: "",
   },
   formFields: [],
+  title: "",
+  date: "",
+  allTags: [],
+  newTags: [],
 };
 
 export const addNoteSlice = createSlice({
