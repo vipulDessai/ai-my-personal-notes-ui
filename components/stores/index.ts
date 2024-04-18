@@ -73,8 +73,11 @@ export {
   setRepositionElement,
   setResizeElement,
   fieldValueOnChange,
-  saveForm,
+  clearForm,
+  setTitle,
+  setNoteDateTime,
   type InputModifyInfoType,
+  ADD_INPUT_MENU_TYPE,
 } from "./features/add-note.slice";
 export { clearTags, getTags } from "./features/tags.slice";
 export { setUserDataError, setUserIsLoading } from "./features/user.slice";

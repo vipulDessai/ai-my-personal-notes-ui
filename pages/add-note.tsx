@@ -36,6 +36,7 @@ import {
   pageTitles,
 } from "../components/utils";
 import {
+  ADD_INPUT_MENU_TYPE,
   AppDispatch,
   InputModifyInfoType,
   RootState,
@@ -45,15 +46,18 @@ import {
   fieldValueOnChange,
   removeField,
   repositionField,
-  saveForm,
+  clearForm,
   setInputModifyInProgress,
   setModal,
   setRepositionElement,
   setResizeElement,
   setShowAddInputMenu,
+  setTitle,
+  setNoteDateTime,
 } from "../components/stores";
 import { CustomInputBox } from "../components/elements";
 import { gql } from "../gql";
+import {} from "../components/stores/features/add-note.slice";
 
 const {
   PlusIcon,
@@ -120,7 +124,7 @@ export default function AddNote() {
     (state: RootState) => state.root.addNote,
   );
 
-  const { showAddInputMenu } = addNoteStoreState;
+  const { addInputMenu } = addNoteStoreState;
 
   const saveNote = () => {
     const recursivelyFormInputData = (
@@ -155,8 +159,6 @@ export default function AddNote() {
         inputData,
       },
     });
-
-    dispatch(saveForm());
   };
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
@@ -230,26 +232,54 @@ export default function AddNote() {
 
       <main className={addNoteStyles["note-catcher"]}>
         <section className={addNoteStyles["basic-details"]}>
-          <TextField
-            label={"title"}
-            multiline
-            fullWidth
-            value={""}
-            onChange={() => {}}
-          />
-          <MobileDateTimePicker
-            sx={{ marginTop: "8px" }}
-            onAccept={() => {}}
-            defaultValue={moment()}
-          />
+          <ul className={addNoteStyles["meta-data-list"]}>
+            <li>
+              <TextField
+                label={"title"}
+                multiline
+                fullWidth
+                value={addNoteStoreState.title}
+                onChange={(event: ChangeEvent<HTMLElement>) => {
+                  const { value } = (event.target ||
+                    event.currentTarget) as HTMLInputElement;
+                  dispatch(setTitle({ value }));
+                }}
+              />
+            </li>
+            <li>
+              <MobileDateTimePicker
+                sx={{ marginTop: "8px" }}
+                onAccept={(currentlySelectedDateInfo: moment.Moment | null) => {
+                  if (currentlySelectedDateInfo) {
+                    const value =
+                      currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
+
+                    dispatch(setNoteDateTime({ value }));
+                  }
+                }}
+                defaultValue={moment(addNoteStoreState.date)}
+              />
+            </li>
+            <li>
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={() => dispatch(setModal({ value: true }))}
+              >
+                Tags
+              </Button>
+            </li>
+            {addNoteAPICallLoading && (
+              <li>
+                <CircularProgress color="inherit" />
+              </li>
+            )}
+          </ul>
         </section>
         {constructedformFieldComponents.length > 0 && (
           <section className={addNoteStyles["note-pad"]}>
             <section className={addNoteStyles["note-pad-overflow-content"]}>
               {constructedformFieldComponents}
-            </section>
-            <section className={addNoteStyles["lazy-loader-save-notes"]}>
-              {addNoteAPICallLoading && <CircularProgress color="inherit" />}
             </section>
           </section>
         )}
@@ -269,7 +299,12 @@ export default function AddNote() {
           aria-label="add"
           className={commonStyles["floating-fab-bottom"]}
           onClick={() => {
-            dispatch(setShowAddInputMenu({ value: true }));
+            dispatch(
+              setShowAddInputMenu({
+                show: true,
+                type: ADD_INPUT_MENU_TYPE.PARENT,
+              }),
+            );
             dispatch(
               setInputModifyInProgress({
                 parentId: "",
@@ -284,9 +319,9 @@ export default function AddNote() {
         <Backdrop
           className={addNoteStyles["add-note-menu"]}
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={showAddInputMenu}
+          open={addInputMenu.show}
           onClick={() => {
-            dispatch(setShowAddInputMenu({ value: false }));
+            dispatch(setShowAddInputMenu({ show: false }));
             dispatch(
               setInputModifyInProgress({
                 parentId: "",
@@ -296,13 +331,29 @@ export default function AddNote() {
             );
           }}
         >
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => dispatch(setModal({ value: true }))}
-          >
-            Tags
-          </Button>
+          {addInputMenu.type === ADD_INPUT_MENU_TYPE.CHILD && (
+            <>
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={() => dispatch(setModal({ value: true }))}
+              >
+                Tags
+              </Button>
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={() =>
+                  dispatch(
+                    addNewField({ type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME }),
+                  )
+                }
+              >
+                Date Time
+              </Button>
+            </>
+          )}
+
           <Button
             color="secondary"
             variant="contained"
@@ -321,24 +372,14 @@ export default function AddNote() {
           >
             Image
           </Button>
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() =>
-              dispatch(
-                addNewField({ type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME }),
-              )
-            }
-          >
-            Date Time
-          </Button>
+
           <Button color="secondary" variant="contained" onClick={saveNote}>
             Save
           </Button>
           <Button
             color="secondary"
             variant="contained"
-            onClick={() => dispatch(saveForm())}
+            onClick={() => dispatch(clearForm())}
           >
             Save As Draft
           </Button>
@@ -462,7 +503,9 @@ const NoteCatcherFormField = ({
 
   const addChildElemToThisFormField = () => {
     handleClose();
-    dispatch(setShowAddInputMenu({ value: true }));
+    dispatch(
+      setShowAddInputMenu({ show: true, type: ADD_INPUT_MENU_TYPE.CHILD }),
+    );
     dispatch(
       setInputModifyInProgress({
         parentId: elemKey,
@@ -506,22 +549,13 @@ const NoteCatcherFormField = ({
         return <CustomInputBox label={label} />;
 
       case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME: {
-        if (value) {
-          const formatedDate = moment(value).format(APP_DATE_TIME_FORMAT);
-          return (
-            <MobileDateTimePicker
-              onAccept={dateTimeFieldOnChange}
-              defaultValue={moment(formatedDate)}
-            />
-          );
-        } else {
-          return (
-            <MobileDateTimePicker
-              onAccept={dateTimeFieldOnChange}
-              defaultValue={moment()}
-            />
-          );
-        }
+        const formatedDate = moment(value).format(APP_DATE_TIME_FORMAT);
+        return (
+          <MobileDateTimePicker
+            onAccept={dateTimeFieldOnChange}
+            defaultValue={moment(formatedDate)}
+          />
+        );
       }
 
       default:

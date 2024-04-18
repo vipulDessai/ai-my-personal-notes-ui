@@ -1,16 +1,26 @@
 .note-catcher {
+  --basic-details-height: 200px;
   position: relative;
   .basic-details {
     width: 80%;
     text-align: center;
     margin: 0 auto;
     margin-bottom: 10px;
+    ul.meta-data-list {
+      margin: 0;
+      & > li:not(:nth-child(1)) {
+        margin-top: 10px;
+      }
+    }
   }
   .note-pad {
     position: relative;
-    height: 100%;
+    height: calc(100% - var(--basic-details-height));
     overflow: auto;
     .note-pad-overflow-content {
+      // bottom margin is only to give space for the
+      // main add input button, otherwise the inputs added
+      // are hidden behind it
       margin-bottom: 100px;
       .formfield-holder {
         .field-container {
@@ -72,9 +82,6 @@
         }
       }
     }
-  }
-  .lazy-loader-save-notes {
-    text-align: center;
   }
   .add-inputs-message {
     text-align: center;

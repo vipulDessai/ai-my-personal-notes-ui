@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment";
 
 import {
+  APP_DATE_TIME_FORMAT,
   FORM_FIELD_INPUT_TYPES,
   FORM_FIELD_REPOSE_DIRECTION,
   generateUUID,
@@ -28,8 +30,16 @@ export interface InputModifyInfoType {
   actionType: "" | "resize" | "reposition" | "add-new-field" | "add-Tags";
 }
 
+export enum ADD_INPUT_MENU_TYPE {
+  PARENT,
+  CHILD,
+}
+
 interface AddNoteState {
-  showAddInputMenu: boolean;
+  addInputMenu: {
+    show: boolean;
+    type: ADD_INPUT_MENU_TYPE;
+  };
   showModal: boolean;
   inputModifyInfo: InputModifyInfoType;
   formFields: NoteCatcherFieldsHierarchy[];
@@ -40,7 +50,10 @@ interface AddNoteState {
 }
 
 export const initialState: AddNoteState = {
-  showAddInputMenu: false,
+  addInputMenu: {
+    show: false,
+    type: ADD_INPUT_MENU_TYPE.PARENT,
+  },
   showModal: false,
   inputModifyInfo: {
     inProgress: false,
@@ -61,11 +74,20 @@ export const addNoteSlice = createSlice({
     setShowAddInputMenu: (
       state,
       action: PayloadAction<{
-        value: boolean;
+        show: boolean;
+        type?: ADD_INPUT_MENU_TYPE;
       }>,
     ) => {
-      const { value } = action.payload;
-      state.showAddInputMenu = value;
+      const { show, type } = action.payload;
+
+      if (show) {
+        state.addInputMenu.show = show;
+
+        if (type) state.addInputMenu.type = type;
+      } else {
+        state.addInputMenu.show = false;
+        state.addInputMenu.type = ADD_INPUT_MENU_TYPE.PARENT;
+      }
     },
     setModal: (
       state,
@@ -149,6 +171,8 @@ export const addNoteSlice = createSlice({
 
         case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
           {
+            const defaultValue = moment().format(APP_DATE_TIME_FORMAT);
+
             noteCatcherField = {
               key: elemKey,
               meta: {
@@ -159,7 +183,7 @@ export const addNoteSlice = createSlice({
                 tags: [],
               },
               childFields: [],
-              value: "",
+              value: defaultValue,
             };
           }
 
@@ -198,7 +222,9 @@ export const addNoteSlice = createSlice({
         state.formFields.push(noteCatcherField);
       }
 
-      state.showAddInputMenu = false;
+      state.addInputMenu.show = false;
+      state.addInputMenu.type = ADD_INPUT_MENU_TYPE.PARENT;
+
       state.inputModifyInfo = {
         inProgress: false,
         elemKey: "",
@@ -389,8 +415,14 @@ export const addNoteSlice = createSlice({
         },
       );
     },
-    saveForm: (state) => {
+    clearForm: (state) => {
       state.formFields = [];
+    },
+    setTitle: (state, action: PayloadAction<{ value: string }>) => {
+      state.title = action.payload.value;
+    },
+    setNoteDateTime: (state, action: PayloadAction<{ value: string }>) => {
+      state.date = action.payload.value;
     },
   },
 });
@@ -405,7 +437,9 @@ export const {
   setRepositionElement,
   setResizeElement,
   fieldValueOnChange,
-  saveForm,
+  clearForm,
+  setTitle,
+  setNoteDateTime,
 } = addNoteSlice.actions;
 
 export const addNoteSliceReducer = addNoteSlice.reducer;
