@@ -43,6 +43,7 @@ interface AddNoteState {
   showModal: boolean;
   inputModifyInfo: InputModifyInfoType;
   formFields: NoteCatcherFieldsHierarchy[];
+  editPrimaryMeta: boolean;
   title: string;
   date: string;
   allTags: string[];
@@ -61,6 +62,7 @@ export const initialState: AddNoteState = {
     actionType: "",
   },
   formFields: [],
+  editPrimaryMeta: false,
   title: "",
   date: "",
   allTags: [],
@@ -71,6 +73,14 @@ export const addNoteSlice = createSlice({
   name: "add-note",
   initialState,
   reducers: {
+    setEditPrimaryMeta: (
+      state,
+      action: PayloadAction<{
+        value: boolean;
+      }>,
+    ) => {
+      state.editPrimaryMeta = action.payload.value;
+    },
     setShowAddInputMenu: (
       state,
       action: PayloadAction<{
@@ -428,6 +438,7 @@ export const addNoteSlice = createSlice({
 });
 
 export const {
+  setEditPrimaryMeta,
   setShowAddInputMenu,
   setModal,
   setInputModifyInProgress,

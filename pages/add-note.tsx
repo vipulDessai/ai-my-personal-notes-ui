@@ -56,8 +56,12 @@ import {
   setNoteDateTime,
 } from "../components/stores";
 import { CustomInputBox } from "../components/elements";
+import { setEditPrimaryMeta } from "../components/stores/features/add-note.slice";
+
+/** GQL <START> */
 import { gql } from "../gql";
-import {} from "../components/stores/features/add-note.slice";
+import { NoteInputsInput } from "../gql/graphql";
+/** GQL <END> */
 
 const {
   PlusIcon,
@@ -71,6 +75,8 @@ const {
   ArrowRightIcon,
   ArrowDropDownIcon,
   DoneIcon,
+  EditIcon,
+  ClearIcon,
 } = iconComponents;
 
 const ADD_NOTE = gql(`
@@ -89,12 +95,6 @@ const ADD_NOTE = gql(`
     }
   }
 `);
-
-interface NoteInputsInput {
-  value?: string;
-  childInputs?: NoteInputsInput[];
-  tags?: string[];
-}
 
 export default function AddNote() {
   const dispatch = useDispatch<AppDispatch>();
@@ -124,11 +124,23 @@ export default function AddNote() {
     (state: RootState) => state.root.addNote,
   );
 
-  const { addInputMenu } = addNoteStoreState;
+  const {
+    addInputMenu,
+    formFields,
+    newTags,
+    allTags,
+    date,
+    title,
+    inputModifyInfo,
+    editPrimaryMeta,
+    showModal,
+  } = addNoteStoreState;
+
+  const [noteTitleValue, setNoteTitleValue] = useState(title);
 
   const saveNote = () => {
     const recursivelyFormInputData = (
-      allFormFields: ReturnType<() => typeof addNoteStoreState.formFields>,
+      allFormFields: ReturnType<() => typeof formFields>,
     ) => {
       if (!allFormFields) return [];
 
@@ -148,14 +160,14 @@ export default function AddNote() {
       return normalizedInputdata;
     };
 
-    const inputData = recursivelyFormInputData(addNoteStoreState.formFields);
+    const inputData = recursivelyFormInputData(formFields);
 
     addTodo({
       variables: {
-        newTags: addNoteStoreState.newTags.map((t) => ({ name: t })),
-        primaryTags: addNoteStoreState.allTags,
-        date: addNoteStoreState.date,
-        title: addNoteStoreState.title,
+        newTags: newTags.map((t) => ({ name: t })),
+        primaryTags: allTags,
+        date: date,
+        title: title,
         inputData,
       },
     });
@@ -163,7 +175,7 @@ export default function AddNote() {
 
   const recursivelyFormNoteCatcherHierarchicalFields = () => {
     const internalRecurringSrchFormElem = (
-      curFormFields: ReturnType<() => typeof addNoteStoreState.formFields>,
+      curFormFields: ReturnType<() => typeof formFields>,
       isRootElem: boolean,
       curLabelPrefix: string,
     ) => {
@@ -199,7 +211,7 @@ export default function AddNote() {
               childNodes={childNodes}
               repositionElement={repositionElement}
               resizeElement={resizeElement}
-              siblingInputModifyInfo={addNoteStoreState.inputModifyInfo}
+              siblingInputModifyInfo={inputModifyInfo}
               value={formField.value}
             />,
           );
@@ -209,11 +221,7 @@ export default function AddNote() {
       return curOut;
     };
 
-    const output = internalRecurringSrchFormElem(
-      addNoteStoreState.formFields,
-      true,
-      "",
-    );
+    const output = internalRecurringSrchFormElem(formFields, true, "");
 
     return output;
   };
@@ -232,49 +240,101 @@ export default function AddNote() {
 
       <main className={addNoteStyles["note-catcher"]}>
         <section className={addNoteStyles["basic-details"]}>
-          <ul className={addNoteStyles["meta-data-list"]}>
+          <ul className={addNoteStyles["meta-data-read-only"]}>
             <li>
+              <label>{title}</label>
+            </li>
+            <li>
+              {!editPrimaryMeta && (
+                <Fab
+                  className={addNoteStyles["edit-primary-meta-data"]}
+                  size="small"
+                  color="primary"
+                  aria-label="inputs options"
+                  onClick={() => dispatch(setEditPrimaryMeta({ value: true }))}
+                >
+                  <EditIcon />
+                </Fab>
+              )}
+            </li>
+          </ul>
+          {editPrimaryMeta && (
+            <ul className={addNoteStyles["meta-data-list"]}>
               <TextField
                 label={"title"}
                 multiline
                 fullWidth
-                value={addNoteStoreState.title}
+                value={noteTitleValue}
                 onChange={(event: ChangeEvent<HTMLElement>) => {
                   const { value } = (event.target ||
                     event.currentTarget) as HTMLInputElement;
-                  dispatch(setTitle({ value }));
+                  setNoteTitleValue(value);
                 }}
               />
-            </li>
-            <li>
-              <MobileDateTimePicker
-                sx={{ marginTop: "8px" }}
-                onAccept={(currentlySelectedDateInfo: moment.Moment | null) => {
-                  if (currentlySelectedDateInfo) {
-                    const value =
-                      currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
-
-                    dispatch(setNoteDateTime({ value }));
-                  }
-                }}
-                defaultValue={moment(addNoteStoreState.date)}
-              />
-            </li>
-            <li>
-              <Button
-                color="secondary"
-                variant="contained"
-                onClick={() => dispatch(setModal({ value: true }))}
-              >
-                Tags
-              </Button>
-            </li>
-            {addNoteAPICallLoading && (
               <li>
-                <CircularProgress color="inherit" />
+                <MobileDateTimePicker
+                  sx={{ marginTop: "8px" }}
+                  onAccept={(
+                    currentlySelectedDateInfo: moment.Moment | null,
+                  ) => {
+                    if (currentlySelectedDateInfo) {
+                      const value =
+                        currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
+
+                      dispatch(setNoteDateTime({ value }));
+                    }
+                  }}
+                  defaultValue={moment(date)}
+                />
               </li>
-            )}
-          </ul>
+              <li>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={() => dispatch(setModal({ value: true }))}
+                >
+                  Tags
+                </Button>
+              </li>
+              {addNoteAPICallLoading && (
+                <li>
+                  <CircularProgress color="inherit" />
+                </li>
+              )}
+              <li className={addNoteStyles["save-primary-meta-data"]}>
+                <ul>
+                  <li>
+                    <Fab
+                      className={addNoteStyles["menu"]}
+                      size="small"
+                      color="primary"
+                      aria-label="inputs options"
+                      onClick={() => {
+                        setNoteTitleValue(title);
+                        dispatch(setEditPrimaryMeta({ value: false }));
+                      }}
+                    >
+                      <ClearIcon />
+                    </Fab>
+                  </li>
+                  <li>
+                    <Fab
+                      className={addNoteStyles["menu"]}
+                      size="small"
+                      color="primary"
+                      aria-label="inputs options"
+                      onClick={() => {
+                        dispatch(setTitle({ value: noteTitleValue }));
+                        dispatch(setEditPrimaryMeta({ value: false }));
+                      }}
+                    >
+                      <DoneIcon />
+                    </Fab>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          )}
         </section>
         {constructedformFieldComponents.length > 0 && (
           <section className={addNoteStyles["note-pad"]}>
@@ -388,7 +448,7 @@ export default function AddNote() {
         <Modal
           aria-labelledby="unstyled-modal-title"
           aria-describedby="unstyled-modal-description"
-          open={addNoteStoreState.showModal}
+          open={showModal}
           onClose={() => dispatch(setModal({ value: false }))}
           className={addNoteStyles["add-note-modal"]}
         >

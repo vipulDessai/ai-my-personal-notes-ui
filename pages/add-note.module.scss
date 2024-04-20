@@ -1,15 +1,45 @@
 .note-catcher {
-  --basic-details-height: 200px;
+  --basic-details-height: 100px;
   position: relative;
   .basic-details {
-    width: 80%;
+    width: 95%;
     text-align: center;
     margin: 0 auto;
     margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+    ul.meta-data-read-only {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      & > li:nth-child(1) {
+        max-width: 100%;
+        label {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          display: inline-block;
+          white-space: nowrap;
+        }
+      }
+      & > li:nth-child(2) {
+        margin-left: 10px;
+      }
+    }
     ul.meta-data-list {
-      margin: 0;
+      position: absolute;
+      top: 0;
+      background: var(--pure-white);
+      width: 100%;
       & > li:not(:nth-child(1)) {
         margin-top: 10px;
+      }
+      & > li.save-primary-meta-data {
+        ul {
+          display: flex;
+          justify-content: center;
+        }
       }
     }
   }
@@ -17,6 +47,7 @@
     position: relative;
     height: calc(100% - var(--basic-details-height));
     overflow: auto;
+    z-index: 0;
     .note-pad-overflow-content {
       // bottom margin is only to give space for the
       // main add input button, otherwise the inputs added
@@ -85,9 +116,6 @@
   }
   .add-inputs-message {
     text-align: center;
-    ul {
-      margin: 0;
-    }
   }
 }
 
@@ -109,16 +137,16 @@
   align-items: center;
   justify-content: center;
   .modal-content {
-    background-color: rgb(28, 32, 37);
+    background-color: var(--black-xl);
     border-radius: 8px;
-    border: 1px solid rgb(67, 77, 91);
+    border: 1px solid var(--black-l);
     padding: 10px;
     width: 90%;
-    color: #ffffff;
+    color: var(--pure-white);
     .tags-searcher {
       margin-block-end: 19.92px;
       input {
-        color: #fff;
+        color: var(--pure-white);
       }
     }
     header {

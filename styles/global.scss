@@ -1,5 +1,9 @@
 :root {
+  --black-xsm: #b4b4b4;
   --black-sm: #494949;
+  --black-l: #404040;
+  --black-xl: #191919;
+  --pure-white: #ffffff;
 }
 
 html,
@@ -41,6 +45,7 @@ img {
 }
 
 ul {
+  margin: 0;
   padding: 0;
   li {
     list-style: none;

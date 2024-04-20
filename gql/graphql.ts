@@ -129,12 +129,14 @@ export type MutationUpdateTagsArgs = {
 export type NoteInputs = {
   __typename?: 'NoteInputs';
   childInputs?: Maybe<Array<NoteInputs>>;
+  date?: Maybe<Scalars['DateTime']['output']>;
   tags?: Maybe<Array<Scalars['String']['output']>>;
   value?: Maybe<Scalars['String']['output']>;
 };
 
 export type NoteInputsInput = {
   childInputs?: InputMaybe<Array<NoteInputsInput>>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   value?: InputMaybe<Scalars['String']['input']>;
 };

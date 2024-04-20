@@ -29,8 +29,3 @@ export const apiConnector = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
-
-/** API Data Interfaces */
-export interface GetUserAuthData {
-  token: string;
-}

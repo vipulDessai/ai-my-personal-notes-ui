@@ -30,10 +30,7 @@ My personal notes managing app powered by AI
 - undo feature for deleting the input form fields in the note catcher
 
 # TODO
-- [ ] add apollo graphQl fetcher
-    - [ ] https://stackoverflow.com/questions/65127544/apolloclient-v3-fetchmore-with-nested-query-results
-    - [ ] use `ApolloProvider` and `useQuery` for react app - [link](https://www.apollographql.com/docs/react/get-started)
-- [ ] add title to topic
+- [ ] optimize space on UI for note's main title date and tags 
 - [ ] git precommit
 - [ ] git hooks
 - [ ] RTK query
@@ -46,6 +43,7 @@ My personal notes managing app powered by AI
 - [ ] save form data per field state in the redux store
 - [ ] save as draft and create new form
 - [ ] error boundary
+- [ ] lazy loading
 - [x] add gap underneath the last input field
 - [ ] git workflows - fix "act(...) is not supported in production builds of React."
 - [ ] learn more about material UI theme 

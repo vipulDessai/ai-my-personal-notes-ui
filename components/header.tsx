@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import hedearStyles from "./header.module.scss";
 
 import { SidePanel } from ".";
-import { GENERAL_KEYS, GetUserAuthData, errorHandler, svg } from "./utils";
+import { GENERAL_KEYS, errorHandler, svg } from "./utils";
 import {
   AppDispatch,
   addNotifications,
@@ -14,11 +14,15 @@ import {
   setUserIsLoading,
 } from "./stores";
 
-const GET_AUTH_TOKEN = gql`
+/** GQL <START> */
+import { gql } from "../gql";
+/** GQL <END> */
+
+const GET_AUTH_TOKEN = gql(`
   mutation getToken($email: String!, $pwd: String!) {
     token(email: $email, password: $pwd)
   }
-`;
+`);
 
 export const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,7 +30,7 @@ export const Header = () => {
   const [
     getUserAuthToken,
     { data: authTokenData, loading: userLoading, error: userAuthFetchError },
-  ] = useMutation<GetUserAuthData>(GET_AUTH_TOKEN);
+  ] = useMutation(GET_AUTH_TOKEN);
 
   useEffect(() => {
     if (userLoading) {
@@ -57,8 +61,8 @@ export const Header = () => {
         // so handle it 😅
         getUserAuthToken({
           variables: {
-            email: process.env.NEXT_PUBLIC_API_USER_ID,
-            pwd: process.env.NEXT_PUBLIC_API_USER_PWD,
+            email: process.env.NEXT_PUBLIC_API_USER_ID || "",
+            pwd: process.env.NEXT_PUBLIC_API_USER_PWD || "",
           },
         });
       }
