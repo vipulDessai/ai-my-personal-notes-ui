@@ -22,6 +22,7 @@ interface NoteCatcherFieldsHierarchy {
   meta: InputFieldInfo;
   childFields: NoteCatcherFieldsHierarchy[];
   value: string;
+  date?: string | null;
 }
 
 export interface InputModifyInfoType {
@@ -156,6 +157,7 @@ export const addNoteSlice = createSlice({
               },
               childFields: [],
               value: "",
+              date: null,
             };
           }
 
@@ -174,6 +176,7 @@ export const addNoteSlice = createSlice({
               },
               childFields: [],
               value: "",
+              date: null,
             };
           }
 
@@ -193,7 +196,8 @@ export const addNoteSlice = createSlice({
                 tags: [],
               },
               childFields: [],
-              value: defaultValue,
+              date: defaultValue,
+              value: "",
             };
           }
 
@@ -211,6 +215,7 @@ export const addNoteSlice = createSlice({
             },
             childFields: [],
             value: "",
+            date: null,
           };
           break;
       }
@@ -409,9 +414,13 @@ export const addNoteSlice = createSlice({
     },
     fieldValueOnChange: (
       state,
-      action: PayloadAction<{ elemKey: string; value: string }>,
+      action: PayloadAction<{
+        elemKey: string;
+        value: string;
+        isDateTime?: boolean;
+      }>,
     ) => {
-      const { elemKey, value } = action.payload;
+      const { elemKey, value, isDateTime } = action.payload;
       findElemAndPerformOperation(
         elemKey,
         null,
@@ -421,7 +430,11 @@ export const addNoteSlice = createSlice({
           currentFormFieldsList: NoteCatcherFieldsHierarchy[],
           index: number,
         ) => {
-          currentFormFieldsList[index].value = value;
+          if (isDateTime) {
+            currentFormFieldsList[index].date = value;
+          } else {
+            currentFormFieldsList[index].value = value;
+          }
         },
       );
     },

@@ -150,6 +150,7 @@ export default function AddNote() {
 
         const curNoteInput: NoteInputsInput = {
           value: curFormFieldData.value,
+          date: curFormFieldData.date,
           childInputs: recursivelyFormInputData(curFormFieldData.childFields),
           tags: curFormFieldData.meta.tags,
         };
@@ -199,6 +200,11 @@ export default function AddNote() {
             `${curLabelPrefix}${i + 1}.`,
           );
 
+          let value = formField.value;
+          if (type === FORM_FIELD_INPUT_TYPES.DATE_AND_TIME) {
+            value = formField.date || "";
+          }
+
           curOut.push(
             <NoteCatcherFormField
               key={key}
@@ -212,7 +218,7 @@ export default function AddNote() {
               repositionElement={repositionElement}
               resizeElement={resizeElement}
               siblingInputModifyInfo={inputModifyInfo}
-              value={formField.value}
+              value={value}
             />,
           );
         }
@@ -586,7 +592,7 @@ const NoteCatcherFormField = ({
     if (currentlySelectedDateInfo) {
       const value = currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
 
-      dispatch(fieldValueOnChange({ elemKey, value: value }));
+      dispatch(fieldValueOnChange({ elemKey, value: value, isDateTime: true }));
     }
   };
 
