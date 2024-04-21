@@ -100,7 +100,7 @@ export default function AddNote() {
   const dispatch = useDispatch<AppDispatch>();
 
   const [
-    addTodo,
+    addNote,
     {
       data: noteAddedStatus,
       loading: addNoteAPICallLoading,
@@ -150,7 +150,7 @@ export default function AddNote() {
 
         const curNoteInput: NoteInputsInput = {
           value: curFormFieldData.value,
-          date: curFormFieldData.date,
+          date: curFormFieldData.meta.date,
           childInputs: recursivelyFormInputData(curFormFieldData.childFields),
           tags: curFormFieldData.meta.tags,
         };
@@ -163,7 +163,7 @@ export default function AddNote() {
 
     const inputData = recursivelyFormInputData(formFields);
 
-    addTodo({
+    addNote({
       variables: {
         newTags: newTags.map((t) => ({ name: t })),
         primaryTags: allTags,
@@ -191,7 +191,7 @@ export default function AddNote() {
 
         // the formField is null if that node is deleted from redux slice
         if (formField) {
-          const { type, key, repositionElement, resizeElement } =
+          const { type, key, repositionElement, resizeElement, date, tags } =
             formField.meta;
 
           const childNodes = internalRecurringSrchFormElem(
@@ -199,11 +199,6 @@ export default function AddNote() {
             false,
             `${curLabelPrefix}${i + 1}.`,
           );
-
-          let value = formField.value;
-          if (type === FORM_FIELD_INPUT_TYPES.DATE_AND_TIME) {
-            value = formField.date || "";
-          }
 
           curOut.push(
             <NoteCatcherFormField
@@ -218,7 +213,9 @@ export default function AddNote() {
               repositionElement={repositionElement}
               resizeElement={resizeElement}
               siblingInputModifyInfo={inputModifyInfo}
-              value={value}
+              value={formField.value}
+              date={date}
+              tags={tags}
             />,
           );
         }
@@ -478,6 +475,8 @@ interface NoteCatcherFormFieldType {
   siblingInputModifyInfo: InputModifyInfoType;
   childNodes: JSX.Element[];
   value: string;
+  date?: string | null;
+  tags: string[];
 }
 
 const NoteCatcherFormField = ({
@@ -491,6 +490,8 @@ const NoteCatcherFormField = ({
   resizeElement,
   siblingInputModifyInfo,
   value,
+  date,
+  tags,
 }: NoteCatcherFormFieldType) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -586,16 +587,6 @@ const NoteCatcherFormField = ({
     dispatch(fieldValueOnChange({ elemKey, value: value }));
   };
 
-  const dateTimeFieldOnChange = (
-    currentlySelectedDateInfo: moment.Moment | null,
-  ) => {
-    if (currentlySelectedDateInfo) {
-      const value = currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
-
-      dispatch(fieldValueOnChange({ elemKey, value: value, isDateTime: true }));
-    }
-  };
-
   const renderFormFieldBasedOnType = () => {
     switch (type) {
       case FORM_FIELD_INPUT_TYPES.INPUT: {
@@ -614,19 +605,93 @@ const NoteCatcherFormField = ({
       case FORM_FIELD_INPUT_TYPES.IMAGE:
         return <CustomInputBox label={label} />;
 
-      case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME: {
-        const formatedDate = moment(value).format(APP_DATE_TIME_FORMAT);
-        return (
-          <MobileDateTimePicker
-            onAccept={dateTimeFieldOnChange}
-            defaultValue={moment(formatedDate)}
-          />
-        );
-      }
-
       default:
         break;
     }
+  };
+
+  const MetaDataRendered = ({
+    date,
+    tags,
+  }: {
+    date?: string | null;
+    tags: string[];
+  }) => {
+    const [editDate, setEditDate] = useState(false);
+    const [localDateValue, setLocalDateValue] = useState(date);
+
+    const formatedDate = localDateValue
+      ? moment(localDateValue).format(APP_DATE_TIME_FORMAT)
+      : null;
+
+    const dateTimeFieldOnChange = (
+      currentlySelectedDateInfo: moment.Moment | null,
+    ) => {
+      if (currentlySelectedDateInfo) {
+        const value = currentlySelectedDateInfo.format(APP_DATE_TIME_FORMAT);
+        setLocalDateValue(value);
+      }
+    };
+
+    return (
+      <section className={addNoteStyles["input-meta-data"]}>
+        {editDate && formatedDate && (
+          <section className={addNoteStyles["edit-meta-data-date"]}>
+            <ul>
+              <li>
+                <MobileDateTimePicker
+                  onAccept={dateTimeFieldOnChange}
+                  defaultValue={moment(formatedDate)}
+                />
+              </li>
+              <li>
+                <ul className={addNoteStyles["action-buttons"]}>
+                  <li onClick={() => setEditDate(false)}>
+                    <ClearIcon />
+                  </li>
+                  <li
+                    onClick={() => {
+                      dispatch(
+                        fieldValueOnChange({
+                          elemKey,
+                          value: localDateValue || "",
+                          isDateTime: true,
+                        }),
+                      );
+                      setEditDate(false);
+                    }}
+                  >
+                    <DoneIcon />
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+        )}
+        <ul className={addNoteStyles["read-only-meta-data"]}>
+          <li>
+            {tags.map((t, index) => (
+              <Chip
+                className={addNoteStyles["chip-for-tags"]}
+                key={index}
+                label={t}
+                variant="outlined"
+              />
+            ))}
+          </li>
+          {localDateValue && (
+            <li className={addNoteStyles["date"]}>
+              <ul>
+                <li>{localDateValue}</li>
+                <li onClick={() => setEditDate(true)}>
+                  <EditIcon />
+                </li>
+              </ul>
+            </li>
+          )}
+        </ul>
+      </section>
+    );
   };
 
   const openMenu = Boolean(anchorEl);
@@ -767,6 +832,7 @@ const NoteCatcherFormField = ({
             )}
         </section>
       </section>
+      <MetaDataRendered tags={tags} date={date} />
       {childNodes}
       <Menu
         MenuListProps={{
@@ -851,7 +917,6 @@ const ModalTagsContainer = forwardRef(
             return (
               <Chip
                 className={addNoteStyles["chip-for-tags"]}
-                sx={{ color: "#fff" }}
                 key={key}
                 label={value}
                 variant="outlined"

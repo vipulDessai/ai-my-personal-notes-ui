@@ -15,6 +15,7 @@ export interface InputFieldInfo {
   repositionElement: boolean;
   resizeElement: boolean;
   tags: string[];
+  date?: string | null;
 }
 
 interface NoteCatcherFieldsHierarchy {
@@ -22,7 +23,6 @@ interface NoteCatcherFieldsHierarchy {
   meta: InputFieldInfo;
   childFields: NoteCatcherFieldsHierarchy[];
   value: string;
-  date?: string | null;
 }
 
 export interface InputModifyInfoType {
@@ -141,86 +141,7 @@ export const addNoteSlice = createSlice({
         elemKey: parentId,
       } = state.inputModifyInfo;
 
-      const elemKey = generateUUID();
-      let noteCatcherField: NoteCatcherFieldsHierarchy;
-      switch (type) {
-        case FORM_FIELD_INPUT_TYPES.INPUT:
-          {
-            noteCatcherField = {
-              key: elemKey,
-              meta: {
-                key: elemKey,
-                type: FORM_FIELD_INPUT_TYPES.INPUT,
-                repositionElement: false,
-                resizeElement: false,
-                tags: [],
-              },
-              childFields: [],
-              value: "",
-              date: null,
-            };
-          }
-
-          break;
-
-        case FORM_FIELD_INPUT_TYPES.IMAGE:
-          {
-            noteCatcherField = {
-              key: elemKey,
-              meta: {
-                key: elemKey,
-                type: FORM_FIELD_INPUT_TYPES.IMAGE,
-                repositionElement: false,
-                resizeElement: false,
-                tags: [],
-              },
-              childFields: [],
-              value: "",
-              date: null,
-            };
-          }
-
-          break;
-
-        case FORM_FIELD_INPUT_TYPES.DATE_AND_TIME:
-          {
-            const defaultValue = moment().format(APP_DATE_TIME_FORMAT);
-
-            noteCatcherField = {
-              key: elemKey,
-              meta: {
-                key: elemKey,
-                type: FORM_FIELD_INPUT_TYPES.DATE_AND_TIME,
-                repositionElement: false,
-                resizeElement: false,
-                tags: [],
-              },
-              childFields: [],
-              date: defaultValue,
-              value: "",
-            };
-          }
-
-          break;
-
-        default:
-          noteCatcherField = {
-            key: elemKey,
-            meta: {
-              key: elemKey,
-              type: FORM_FIELD_INPUT_TYPES.INPUT,
-              repositionElement: false,
-              resizeElement: false,
-              tags: [],
-            },
-            childFields: [],
-            value: "",
-            date: null,
-          };
-          break;
-      }
-
-      if (inProgress && actionType === "add-new-field" && parentId) {
+      if (type == FORM_FIELD_INPUT_TYPES.DATE_AND_TIME) {
         findElemAndPerformOperation(
           parentId,
           null,
@@ -230,11 +151,88 @@ export const addNoteSlice = createSlice({
             currentFormFieldsList: NoteCatcherFieldsHierarchy[],
             index: number,
           ) => {
-            currentFormFieldsList[index].childFields.push(noteCatcherField);
+            const defaultValue = moment().format(APP_DATE_TIME_FORMAT);
+            currentFormFieldsList[index].meta.date = defaultValue;
           },
         );
       } else {
-        state.formFields.push(noteCatcherField);
+        const elemKey = generateUUID();
+        let noteCatcherField: NoteCatcherFieldsHierarchy;
+        switch (type) {
+          case FORM_FIELD_INPUT_TYPES.INPUT:
+            {
+              noteCatcherField = {
+                key: elemKey,
+                meta: {
+                  key: elemKey,
+                  type: FORM_FIELD_INPUT_TYPES.INPUT,
+                  repositionElement: false,
+                  resizeElement: false,
+                  tags: [],
+                  date: null,
+                },
+                childFields: [],
+                value: "",
+              };
+            }
+
+            break;
+
+          case FORM_FIELD_INPUT_TYPES.IMAGE:
+            {
+              noteCatcherField = {
+                key: elemKey,
+                meta: {
+                  key: elemKey,
+                  type: FORM_FIELD_INPUT_TYPES.IMAGE,
+                  repositionElement: false,
+                  resizeElement: false,
+                  tags: [],
+                  date: null,
+                },
+                childFields: [],
+                value: "",
+              };
+            }
+
+            break;
+
+          default:
+            noteCatcherField = {
+              key: elemKey,
+              meta: {
+                key: elemKey,
+                type: FORM_FIELD_INPUT_TYPES.INPUT,
+                repositionElement: false,
+                resizeElement: false,
+                tags: [],
+                date: null,
+              },
+              childFields: [],
+              value: "",
+            };
+            break;
+        }
+
+        // for adding a new child input under a parent input
+        if (inProgress && actionType === "add-new-field" && parentId) {
+          findElemAndPerformOperation(
+            parentId,
+            null,
+            state.formFields,
+            (
+              parentField: NoteCatcherFieldsHierarchy[] | null,
+              currentFormFieldsList: NoteCatcherFieldsHierarchy[],
+              index: number,
+            ) => {
+              currentFormFieldsList[index].childFields.push(noteCatcherField);
+            },
+          );
+        }
+        // add a parent input
+        else {
+          state.formFields.push(noteCatcherField);
+        }
       }
 
       state.addInputMenu.show = false;
@@ -431,7 +429,7 @@ export const addNoteSlice = createSlice({
           index: number,
         ) => {
           if (isDateTime) {
-            currentFormFieldsList[index].date = value;
+            currentFormFieldsList[index].meta.date = value;
           } else {
             currentFormFieldsList[index].value = value;
           }
