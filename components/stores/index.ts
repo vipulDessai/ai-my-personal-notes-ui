@@ -5,18 +5,10 @@ import { thunk } from "redux-thunk";
 
 import { appFeedbackSliceReducer } from "./features/feedback.slice";
 import { addNoteSliceReducer } from "./features/add-note.slice";
-import { tagsSliceReducer } from "./features/tags.slice";
 import { userSliceReducer } from "./features/user.slice";
 
 const combinedAsyncSlices = combineReducers({
   addNote: persistReducer({ key: "add-note", storage }, addNoteSliceReducer),
-  tags: persistReducer(
-    {
-      key: "tags",
-      storage,
-    },
-    tagsSliceReducer,
-  ),
   appFeed: appFeedbackSliceReducer,
   user: persistReducer(
     {
@@ -77,8 +69,9 @@ export {
   clearForm,
   setTitle,
   setNoteDateTime,
-  type InputModifyInfoType,
+  setTagsForField,
   ADD_INPUT_MENU_TYPE,
+  type InputModifyInfoType,
+  type TagsData,
 } from "./features/add-note.slice";
-export { clearTags, getTags } from "./features/tags.slice";
 export { setUserDataError, setUserIsLoading } from "./features/user.slice";

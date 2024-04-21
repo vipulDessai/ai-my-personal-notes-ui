@@ -9,12 +9,17 @@ import {
   generateUUID,
 } from "../../utils";
 
+export interface TagsData {
+  key: string | null;
+  name: string;
+}
+
 export interface InputFieldInfo {
   type: string;
   key: string;
   repositionElement: boolean;
   resizeElement: boolean;
-  tags: string[];
+  tags: TagsData[];
   date?: string | null;
 }
 
@@ -445,6 +450,27 @@ export const addNoteSlice = createSlice({
     setNoteDateTime: (state, action: PayloadAction<{ value: string }>) => {
       state.date = action.payload.value;
     },
+    setTagsForField: (
+      state,
+      action: PayloadAction<{
+        elemKey: string;
+        tagsArray: TagsData[];
+      }>,
+    ) => {
+      const { elemKey, tagsArray } = action.payload;
+      findElemAndPerformOperation(
+        elemKey,
+        null,
+        state.formFields,
+        (
+          parentField: NoteCatcherFieldsHierarchy[],
+          currentFormFieldsList: NoteCatcherFieldsHierarchy[],
+          index: number,
+        ) => {
+          currentFormFieldsList[index].meta.tags = tagsArray;
+        },
+      );
+    },
   },
 });
 
@@ -462,6 +488,7 @@ export const {
   clearForm,
   setTitle,
   setNoteDateTime,
+  setTagsForField,
 } = addNoteSlice.actions;
 
 export const addNoteSliceReducer = addNoteSlice.reducer;

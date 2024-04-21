@@ -22,7 +22,7 @@ import {
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
@@ -43,7 +43,6 @@ import {
   RootState,
   addNewField,
   addNotifications,
-  clearTags,
   fieldValueOnChange,
   removeField,
   repositionField,
@@ -55,9 +54,11 @@ import {
   setShowAddInputMenu,
   setTitle,
   setNoteDateTime,
+  TagsData,
+  setEditPrimaryMeta,
+  setTagsForField,
 } from "../components/stores";
 import { CustomInputBox } from "../components/elements";
-import { setEditPrimaryMeta } from "../components/stores/features/add-note.slice";
 
 /** GQL <START> */
 import { gql } from "../gql";
@@ -153,7 +154,8 @@ export default function AddNote() {
           value: curFormFieldData.value,
           date: curFormFieldData.meta.date,
           childInputs: recursivelyFormInputData(curFormFieldData.childFields),
-          tags: curFormFieldData.meta.tags,
+          // TODO: correct the tags ids sent in the payload
+          tags: curFormFieldData.meta.tags.map((t) => t.key || t.name),
         };
 
         normalizedInputdata.push(curNoteInput);
@@ -395,7 +397,20 @@ export default function AddNote() {
               <Button
                 color="secondary"
                 variant="contained"
-                onClick={() => dispatch(setModal({ value: true }))}
+                onClick={() => {
+                  dispatch(setModal({ value: true }));
+
+                  const copyElemKey = inputModifyInfo.elemKey;
+                  setTimeout(() => {
+                    dispatch(
+                      setInputModifyInProgress({
+                        parentId: copyElemKey,
+                        value: true,
+                        type: "add-Tags",
+                      }),
+                    );
+                  });
+                }}
               >
                 Tags
               </Button>
@@ -448,7 +463,16 @@ export default function AddNote() {
           aria-labelledby="unstyled-modal-title"
           aria-describedby="unstyled-modal-description"
           open={showModal}
-          onClose={() => dispatch(setModal({ value: false }))}
+          onClose={() => {
+            dispatch(
+              setInputModifyInProgress({
+                parentId: "",
+                value: false,
+                type: "",
+              }),
+            );
+            dispatch(setModal({ value: false }));
+          }}
           className={addNoteStyles["add-note-modal"]}
         >
           <ModalTagsContainer />
@@ -476,7 +500,7 @@ interface NoteCatcherFormFieldType {
   childNodes: JSX.Element[];
   value: string;
   date?: string | null;
-  tags: string[];
+  tags: TagsData[];
 }
 
 const NoteCatcherFormField = ({
@@ -615,7 +639,7 @@ const NoteCatcherFormField = ({
     tags,
   }: {
     date?: string | null;
-    tags: string[];
+    tags: TagsData[];
   }) => {
     const [editDate, setEditDate] = useState(false);
     const [localDateValue, setLocalDateValue] = useState(date);
@@ -670,11 +694,12 @@ const NoteCatcherFormField = ({
         )}
         <ul className={addNoteStyles["read-only-meta-data"]}>
           <li>
+            {/* TODO: enable the tags edit feature */}
             {tags.map((t, index) => (
               <Chip
                 className={addNoteStyles["chip-for-tags"]}
                 key={index}
-                label={t}
+                label={t.name}
                 variant="outlined"
               />
             ))}
@@ -878,16 +903,68 @@ const NoteCatcherFormField = ({
   );
 };
 
+const GET_TAGS_ON_SEARCH = gql(`
+  query getTagsFilterSearch(
+    $size: Int,
+    $page: Int,
+  ) {
+    tags(input: {
+      batchSize: $size,
+      page: $page
+    }) {
+      tags {
+        key
+        value {
+          name
+        }
+      }
+    }
+  }
+`);
+
+interface TagsDataWithSelector {
+  key: string;
+  selected: boolean;
+  name: string;
+}
+
 const ModalTagsContainer = forwardRef(
   function ModalTagsContainerComponentFunc() {
+    const {
+      data: tagsData,
+      loading: tagsLoading,
+      error: tagsFetchError,
+    } = useQuery(GET_TAGS_ON_SEARCH);
+
+    const addNoteStoreState = useSelector(
+      (state: RootState) => state.root.addNote,
+    );
+
     const dispatch = useDispatch<AppDispatch>();
-    const tagseStoreState = useSelector((state: RootState) => state.root.tags);
+
+    const normalizedTagsData: TagsDataWithSelector[] = [];
+    const [tagsDataLocal, setTagsDataLocal] = useState(normalizedTagsData);
 
     useEffect(() => {
-      if (tagseStoreState.tags.length == 0) {
-        // TODO: get tags
+      if (tagsFetchError) dispatch(addNotifications(tagsFetchError.message));
+    }, [tagsFetchError]);
+
+    useEffect(() => {
+      if (tagsData?.tags.tags) {
+        const normalizedTagsData: TagsDataWithSelector[] = [];
+        const allTags = tagsData?.tags.tags;
+        for (let i = 0; i < allTags.length; ++i) {
+          const curTag = allTags[i];
+          normalizedTagsData.push({
+            key: curTag.key,
+            name: curTag.value.name || "",
+            selected: false,
+          });
+        }
+
+        setTagsDataLocal(normalizedTagsData);
       }
-    }, [tagseStoreState]);
+    }, [tagsData]);
 
     return (
       <section className={addNoteStyles["modal-content"]}>
@@ -906,45 +983,59 @@ const ModalTagsContainer = forwardRef(
           />
         </section>
         <section className={addNoteStyles["tags-holder"]}>
-          {tagseStoreState.isLoading && (
+          {tagsLoading && (
             <section className={addNoteStyles["loading-content"]}>
               <CircularProgress color="inherit" />
             </section>
           )}
-          {tagseStoreState.tags.map((t) => {
-            const [key, value] = t;
+          {tagsDataLocal.map((t) => {
+            const { key, name, selected } = t;
 
             return (
               <Chip
                 className={addNoteStyles["chip-for-tags"]}
                 key={key}
-                label={value}
-                variant="outlined"
+                label={name}
+                variant={selected ? "filled" : "outlined"}
+                onClick={() => {
+                  const tagsDataLocalReplica = [...tagsDataLocal];
+                  for (let i = 0; i < tagsDataLocalReplica.length; ++i) {
+                    const curTag = tagsDataLocalReplica[i];
+                    if (curTag.key === key) {
+                      curTag.selected = !curTag.selected;
+                      break;
+                    }
+                  }
+
+                  setTagsDataLocal(tagsDataLocalReplica);
+                }}
               />
             );
           })}
         </section>
         <footer>
-          {tagseStoreState.tags.length > 0 && (
-            <Button
-              color="secondary"
-              variant="contained"
-              onClick={() => dispatch(clearTags())}
-            >
-              clear
-            </Button>
-          )}
-          {tagseStoreState.tags.length == 0 && (
-            <Button
-              color="secondary"
-              variant="contained"
-              onClick={() => {
-                /** TODO: get tags */
-              }}
-            >
-              re-fetch
-            </Button>
-          )}
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => {
+              dispatch(
+                setTagsForField({
+                  elemKey: addNoteStoreState.inputModifyInfo.elemKey,
+                  tagsArray: tagsDataLocal.filter((t) => t.selected),
+                }),
+              );
+              dispatch(setModal({ value: false }));
+              dispatch(
+                setInputModifyInProgress({
+                  parentId: "",
+                  value: false,
+                  type: "",
+                }),
+              );
+            }}
+          >
+            Save
+          </Button>
         </footer>
       </section>
     );
