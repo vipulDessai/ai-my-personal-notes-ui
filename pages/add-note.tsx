@@ -17,6 +17,7 @@ import {
   Modal,
   CircularProgress,
   Chip,
+  Snackbar,
 } from "@mui/material";
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
@@ -299,11 +300,6 @@ export default function AddNote() {
                   Tags
                 </Button>
               </li>
-              {addNoteAPICallLoading && (
-                <li>
-                  <CircularProgress color="inherit" />
-                </li>
-              )}
               <li className={addNoteStyles["save-primary-meta-data"]}>
                 <ul>
                   <li>
@@ -457,6 +453,10 @@ export default function AddNote() {
         >
           <ModalTagsContainer />
         </Modal>
+
+        <Snackbar open={addNoteAPICallLoading}>
+          <CircularProgress color="inherit" />
+        </Snackbar>
       </main>
 
       <Footer />
