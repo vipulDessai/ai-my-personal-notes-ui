@@ -21,6 +21,7 @@ export interface InputFieldInfo {
   resizeElement: boolean;
   tags: TagsData[];
   date?: string | null;
+  ref: string[]; // TODO: implement feature - attach other notes as a ref to current note
 }
 
 interface NoteCatcherFieldsHierarchy {
@@ -52,7 +53,7 @@ interface AddNoteState {
   editPrimaryMeta: boolean;
   title: string;
   date: string;
-  allTags: string[];
+  allTags: TagsData[];
   newTags: string[];
 }
 
@@ -175,6 +176,7 @@ export const addNoteSlice = createSlice({
                   resizeElement: false,
                   tags: [],
                   date: null,
+                  ref: [],
                 },
                 childFields: [],
                 value: "",
@@ -194,6 +196,7 @@ export const addNoteSlice = createSlice({
                   resizeElement: false,
                   tags: [],
                   date: null,
+                  ref: [],
                 },
                 childFields: [],
                 value: "",
@@ -212,6 +215,7 @@ export const addNoteSlice = createSlice({
                 resizeElement: false,
                 tags: [],
                 date: null,
+                ref: [],
               },
               childFields: [],
               value: "",
@@ -455,9 +459,14 @@ export const addNoteSlice = createSlice({
       action: PayloadAction<{
         elemKey: string;
         tagsArray: TagsData[];
+        newTags: string[];
       }>,
     ) => {
-      const { elemKey, tagsArray } = action.payload;
+      const { elemKey, tagsArray, newTags } = action.payload;
+
+      state.allTags = tagsArray;
+      state.newTags = newTags;
+
       findElemAndPerformOperation(
         elemKey,
         null,

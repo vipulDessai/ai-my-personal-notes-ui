@@ -4,6 +4,8 @@ import {
   useState,
   useEffect,
   forwardRef,
+  useRef,
+  MutableRefObject,
 } from "react";
 import Head from "next/head";
 import {
@@ -22,7 +24,7 @@ import {
 import { MobileDateTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 
 import commonStyles from "../styles/common.module.scss";
 import addNoteStyles from "./add-note.module.scss";
@@ -169,7 +171,7 @@ export default function AddNote() {
     addNote({
       variables: {
         newTags: newTags.map((t) => ({ name: t })),
-        primaryTags: allTags,
+        primaryTags: allTags.map((t) => t.name),
         date: date,
         title: title,
         inputData,
@@ -903,8 +905,8 @@ const NoteCatcherFormField = ({
   );
 };
 
-const GET_TAGS_ON_SEARCH = gql(`
-  query getTagsFilterSearch(
+const GET_ALL_TAGS = gql(`
+  query getAllTags (
     $size: Int,
     $page: Int,
   ) {
@@ -921,11 +923,31 @@ const GET_TAGS_ON_SEARCH = gql(`
     }
   }
 `);
+const GET_TAGS_ON_SEARCH = gql(`
+  query getTagsOnFilter (
+    $size: Int,
+    $page: Int,
+    $tagsName: [String!],
+  ) {
+    tags(input: {
+      batchSize: $size,
+      page: $page,
+      tagsName: $tagsName
+    }) {
+      tags {
+        key
+        value {
+          name
+        }
+      }
+    }
+  }
+`);
 
 interface TagsDataWithSelector {
   key: string;
-  selected: boolean;
   name: string;
+  selected: boolean;
 }
 
 const ModalTagsContainer = forwardRef(
@@ -934,11 +956,26 @@ const ModalTagsContainer = forwardRef(
       data: tagsData,
       loading: tagsLoading,
       error: tagsFetchError,
-    } = useQuery(GET_TAGS_ON_SEARCH);
+    } = useQuery(GET_ALL_TAGS);
+
+    // TODO: show loading for the tags lazy fetch
+    const [
+      searchTags,
+      {
+        data: searchTagsData,
+        loading: searchTagsLoading,
+        error: searchTagsFetchError,
+      },
+    ] = useLazyQuery(GET_TAGS_ON_SEARCH);
+
+    const searchFieldDebounceTimerRef: MutableRefObject<any> = useRef();
 
     const addNoteStoreState = useSelector(
       (state: RootState) => state.root.addNote,
     );
+
+    // TODO: show the already attached tags
+    const { inputModifyInfo, allTags, newTags } = addNoteStoreState;
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -949,7 +986,7 @@ const ModalTagsContainer = forwardRef(
       if (tagsFetchError) dispatch(addNotifications(tagsFetchError.message));
     }, [tagsFetchError]);
 
-    useEffect(() => {
+    const initTagsData = () => {
       if (tagsData?.tags.tags) {
         const normalizedTagsData: TagsDataWithSelector[] = [];
         const allTags = tagsData?.tags.tags;
@@ -964,6 +1001,10 @@ const ModalTagsContainer = forwardRef(
 
         setTagsDataLocal(normalizedTagsData);
       }
+    };
+
+    useEffect(() => {
+      initTagsData();
     }, [tagsData]);
 
     return (
@@ -980,6 +1021,30 @@ const ModalTagsContainer = forwardRef(
             fullWidth
             color="secondary"
             focused
+            onChange={(e) => {
+              clearTimeout(searchFieldDebounceTimerRef.current);
+
+              searchFieldDebounceTimerRef.current = setTimeout(() => {
+                const searchedText = e.target.value;
+
+                // TODO: correct the logic to add new
+                if (searchedText) {
+                  const curSearchedTags = tagsDataLocal.filter(
+                    (t) => t.name.indexOf(searchedText) > -1,
+                  );
+
+                  if (curSearchedTags.length) {
+                    setTagsDataLocal(curSearchedTags);
+                  } else {
+                    searchTags({
+                      variables: { page: 0, size: 100, tagsName: [] },
+                    });
+                  }
+                } else {
+                  initTagsData();
+                }
+              }, 1000);
+            }}
           />
         </section>
         <section className={addNoteStyles["tags-holder"]}>
@@ -1020,8 +1085,9 @@ const ModalTagsContainer = forwardRef(
             onClick={() => {
               dispatch(
                 setTagsForField({
-                  elemKey: addNoteStoreState.inputModifyInfo.elemKey,
+                  elemKey: inputModifyInfo.elemKey,
                   tagsArray: tagsDataLocal.filter((t) => t.selected),
+                  newTags: [],
                 }),
               );
               dispatch(setModal({ value: false }));
