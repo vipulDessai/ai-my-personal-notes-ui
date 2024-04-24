@@ -1083,11 +1083,21 @@ const ModalTagsContainer = forwardRef(
             color="secondary"
             variant="contained"
             onClick={() => {
+              const currentlySelectedTags = tagsDataLocal.filter(
+                (t) => t.selected,
+              );
+              const currentAllTags = [...allTags, ...currentlySelectedTags];
+
+              const currentNewlyAddedTags = currentlySelectedTags
+                .filter((t) => !t.key)
+                .map((t) => t.name);
+              const currentNewTags = [...newTags, ...currentNewlyAddedTags];
+
               dispatch(
                 setTagsForField({
                   elemKey: inputModifyInfo.elemKey,
-                  tagsArray: tagsDataLocal.filter((t) => t.selected),
-                  newTags: [],
+                  tagsArray: currentAllTags,
+                  newTags: currentNewTags,
                 }),
               );
               dispatch(setModal({ value: false }));
