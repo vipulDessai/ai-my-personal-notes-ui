@@ -96,7 +96,7 @@ export default {
   mode: webpackMode,
 
   entry: {
-    app: "./src/index.js", // Entry point
+    app: "./index.tsx", // Entry point
   },
 
   output: {
@@ -189,12 +189,13 @@ export default {
 
           // process the react dependencies
           {
-            test: /\.js$/,
-            include: /\/node_modules/,
+            test: /\.(js|cjs)$/,
+            include: /node_modules/,
             exclude: [/@babel(?:\/|\\{1,2})runtime/],
             use: {
               loader: "babel-loader",
               options: {
+                presets: ["@babel/preset-env"],
                 // Babel sourcemaps are needed for debugging into node_modules
                 // code.  Without the options below, debuggers like VSCode
                 // show incorrect code and set breakpoints on the wrong lines.
@@ -226,25 +227,6 @@ export default {
                 },
               },
               "postcss-loader",
-            ],
-          },
-          // process the application only SCSS
-          {
-            test: /\.scss$/,
-            exclude: /node_modules/,
-            use: [
-              {
-                loader: MiniCssExtractPlugin.loader,
-                options: { esModule: true }, // Required for lazy loading
-              },
-              {
-                loader: "css-loader", // Process CSS files
-                options: {
-                  importLoaders: 3,
-                  url: false, // Ignore `url()` paths in CSS
-                },
-              },
-              "sass-loader", // Process SCSS files
             ],
           },
 

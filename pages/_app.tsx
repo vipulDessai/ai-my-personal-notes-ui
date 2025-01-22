@@ -10,7 +10,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import "../styles/global.scss";
+import "../styles/global.css";
 
 import { globalStore, persistedGlobalStore } from "../components/stores";
 import { CommonFeedbackComponents } from "../components";

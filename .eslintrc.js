@@ -1,10 +1,10 @@
-{
-  "extends": ["next/core-web-vitals", "eslint:recommended"],
-  "rules": {
+module.exports = {
+  extends: ["eslint:recommended"],
+  rules: {
     // enable additional rules
     "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "double"],
-    "semi": ["error", "always"],
+    quotes: ["error", "double"],
+    semi: ["error", "always"],
 
     // override configuration set by extending "eslint:recommended"
     "no-empty": "warn",
@@ -13,6 +13,6 @@
 
     // disable rules from base configurations
     "for-direction": "off",
-    "no-undef": "off"
-  }
-}
+    "no-undef": "off",
+  },
+};

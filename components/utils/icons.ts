@@ -21,11 +21,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 /** Material UI Icons <END> */
 
 import logo from "../../public/note-manager-app-main-logo.svg";
-import vercelLogo from "../../public/vercel.svg";
 
 export const svg = {
   logo,
-  vercelLogo,
 };
 
 export const iconComponents = {

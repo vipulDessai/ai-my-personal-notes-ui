@@ -12,11 +12,7 @@ export const Footer = () => {
         rel="noopener noreferrer"
       >
         <span>Powered by</span>
-        <img
-          src={svg.vercelLogo}
-          alt="Vercel"
-          className={commonStyles.logo}
-        />
+        <img src={""} alt="Vercel" className={commonStyles.logo} />
       </a>
     </footer>
   );
