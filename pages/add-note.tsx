@@ -7,7 +7,6 @@ import {
   useRef,
   MutableRefObject,
 } from "react";
-import Head from "next/head";
 import {
   Button,
   Fab,
@@ -26,8 +25,8 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 
-import commonStyles from "../styles/common.module.scss";
-import addNoteStyles from "./add-note.module.scss";
+import commonStyles from "../styles/common.module.css";
+import addNoteStyles from "./add-note.module.css";
 
 import { Header, Footer } from "../components";
 import {
@@ -239,10 +238,10 @@ export default function AddNote() {
 
   return (
     <div className={commonStyles.container}>
-      <Head>
+      {/* <Head>
         <title>{pageTitles.ADD_NOTE}</title>
         <link rel="icon" href="/favicon.ico" />
-      </Head>
+      </Head> */}
 
       <Header />
 

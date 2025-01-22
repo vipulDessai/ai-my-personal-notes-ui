@@ -1,6 +1,4 @@
-import Image from "next/image";
-
-import commonStyles from "../styles/common.module.scss";
+import commonStyles from "../styles/common.module.css";
 
 import { svg } from "./utils";
 
@@ -14,7 +12,7 @@ export const Footer = () => {
         rel="noopener noreferrer"
       >
         <span>Powered by</span>
-        <Image
+        <img
           src={svg.vercelLogo}
           alt="Vercel"
           className={commonStyles.logo}

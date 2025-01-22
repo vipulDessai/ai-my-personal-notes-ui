@@ -49,9 +49,11 @@
     overflow: auto;
     z-index: 0;
     .note-pad-overflow-content {
-      // bottom margin is only to give space for the
-      // main add input button, otherwise the inputs added
-      // are hidden behind it
+      /* 
+        bottom margin is only to give space for the
+        main add input button, otherwise the inputs added
+        are hidden behind it 
+      */
       margin-bottom: 100px;
       .formfield-holder {
         .field-container {
@@ -147,7 +149,7 @@
   }
 }
 
-// placed outside because the menu is a react portal
+ /* placed outside because the menu is a react portal */
 .note-catcher-form-field-menu-icon {
   width: 35px;
   display: inline-flex;

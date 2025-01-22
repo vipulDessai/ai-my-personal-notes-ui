@@ -7,11 +7,10 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import Head from "next/head";
 import { useLazyQuery } from "@apollo/client";
 
-import commonStyles from "../styles/common.module.scss";
-import homePageStyles from "./index.module.scss";
+import commonStyles from "../styles/common.module.css";
+import homePageStyles from "./index.module.css";
 
 import { Header, Footer } from "../components";
 import { pageTitles, toDictionary, iconComponents } from "../components/utils";
@@ -96,10 +95,10 @@ export default function Home() {
 
   return (
     <div className={commonStyles.container}>
-      <Head>
+      {/* <Head>
         <title>{pageTitles.HOME}</title>
         <link rel="icon" href="/favicon.ico" />
-      </Head>
+      </Head> */}
 
       <Header />
 

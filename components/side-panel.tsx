@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
 import {
   Box,
   IconButton,
@@ -20,7 +19,6 @@ import { RootState } from "./stores";
 const { InboxIcon, MailIcon, MenuIcon, AccountCircleIcon } = iconComponents;
 
 export function SidePanel() {
-  const router = useRouter();
   const [showSideMenu, setShowSideMenu] = useState(false);
 
   const isLoading = useSelector(
@@ -65,7 +63,8 @@ export function SidePanel() {
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
-              router.push("/");
+              // TODO: add react router
+              // router.push("/");
             }}
           >
             <ListItemIcon>
@@ -80,7 +79,8 @@ export function SidePanel() {
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
-              router.push("/add-note");
+              // TODO: add react router
+              // router.push("/add-note");
             }}
           >
             <ListItemIcon>

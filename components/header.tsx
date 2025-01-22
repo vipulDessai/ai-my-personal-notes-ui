@@ -1,9 +1,8 @@
-import Image from "next/image";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useMutation } from "@apollo/client";
 
-import hedearStyles from "./header.module.scss";
+import hedearStyles from "./header.module.css";
 
 import { SidePanel } from ".";
 import { GENERAL_KEYS, errorHandler, svg } from "./utils";
@@ -74,11 +73,11 @@ export const Header = () => {
   return (
     <header className={hedearStyles["app-main-header"]}>
       <section>
-        <Image
+        <img
           alt="app logo"
           src={svg.logo}
           className={hedearStyles["app-logo"]}
-        ></Image>
+        ></img>
       </section>
       <section>
         <SidePanel />

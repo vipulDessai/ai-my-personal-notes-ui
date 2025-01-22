@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Alert, AlertTitle, Backdrop, Snackbar } from "@mui/material";
 
-import commonFeedback from "./common-feedback.module.scss";
+import commonFeedback from "./common-feedback.module.css";
 
 import {
   AppDispatch,
