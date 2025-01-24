@@ -13,6 +13,8 @@ import CopyPlugin from "copy-webpack-plugin";
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import ReactRefreshTypeScript from "react-refresh-typescript";
 import ESLintPlugin from "eslint-webpack-plugin";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+import CompressionPlugin from "compression-webpack-plugin";
 
 import { getClientEnvironment } from "./webpack/index.mjs";
 
@@ -29,8 +31,8 @@ let skipTypeCheck = false;
 // while the HMR is active certain precached modules
 // throw error while recompiling which takes away
 // the advantage of HMR, so while development
-// include them by setting excludePrecachedLibs
-let excludePrecachedLibs = false;
+// include them by setting cachePrebuildLibBinaries
+let cachePrebuildLibBinaries = false;
 
 const NODE_ENV = process.env.NODE_ENV || "dev";
 switch (NODE_ENV) {
@@ -42,27 +44,39 @@ switch (NODE_ENV) {
     needSourceMaps = true;
     generateServiceWorker = true;
     skipTypeCheck = true;
-    excludePrecachedLibs = true;
+    cachePrebuildLibBinaries = true;
     webpackMode = "production";
     break;
 
   case "local":
-    needHotReload = true;
     needSourceMaps = true;
-    needBundleAnalyser = false; // TODO: set needBundleAnalyser
+    generateServiceWorker = false; // set false in local env
+    skipTypeCheck = false; // set false in local env
+    cachePrebuildLibBinaries = false; // set false in local env
+    needHotReload = true; // set true in local env
+    needBundleAnalyser = true; // set true in local env
     webpackMode = "development";
+
+    // setting for local build (uncomment to build with env.local locally)
+    // generateServiceWorker = true;
+    // skipTypeCheck = true;
+    // cachePrebuildLibBinaries = true;
+    // needHotReload = false;
+    // needBundleAnalyser = true;
+    // webpackMode = "production";
     break;
 
   default:
     needSourceMaps = true;
     generateServiceWorker = true;
     skipTypeCheck = true;
-    excludePrecachedLibs = true;
+    cachePrebuildLibBinaries = true;
     webpackMode = "development";
     break;
 }
 
 console.info("Current Actual Enviornment: " + NODE_ENV);
+console.info("Webpack Mode: " + webpackMode);
 console.info("Hot Reload: " + needHotReload);
 
 // inline-source-map - Full source map inlined in the bundle (the code is as it is, without the .map files)
@@ -78,7 +92,7 @@ console.info("Skip Type Checking: " + skipTypeCheck);
 
 console.info("Bundle Analyser: " + needBundleAnalyser);
 console.info("Generate Service Worker: " + generateServiceWorker);
-console.info("Cache Prebuild large lib binaries: " + excludePrecachedLibs);
+console.info("Cache Prebuild large lib binaries: " + cachePrebuildLibBinaries);
 
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
@@ -107,18 +121,9 @@ export default {
     clean: true, // Ensures the output folder is cleared before building, so old files don’t linger.
   },
 
+  // Code splitting optimization:
   optimization: {
-    splitChunks: {
-      chunks: "all", // enable auto code chunks for all code splits
-      maxSize: 200000, // Split files larger than 200 KB
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: "vendors",
-          chunks: "all",
-        },
-      },
-    },
+    minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -142,7 +147,32 @@ export default {
         },
         parallel: true, // Enable multi-threading for faster builds
       }),
+      new CssMinimizerPlugin({
+        minimizerOptions: {
+          preset: [
+            "default",
+            {
+              discardComments: { removeAll: true },
+            },
+          ],
+        },
+      }),
     ],
+    splitChunks: Object.assign(
+      {},
+      {
+        // chunks: 'all' - Considers all modules for splitting to identify and extract common ones into separate chunks for reuse.
+        chunks: "all", // enable auto code chunks for all code splits,
+        // name: false - Uses numeric IDs for chunk names to reduce HTML size.
+        name: false,
+      },
+    ),
+    // By extracting the runtime code into a separate chunk,
+    // you can reduce the size of your main entry bundles.
+    // This can lead to faster initial load times.
+    runtimeChunk: {
+      name: (entrypoint) => `runtime-${entrypoint.name}`,
+    },
   },
 
   // global resolver, without include or exclude path
@@ -289,6 +319,11 @@ export default {
     needBundleAnalyser &&
       new BundleAnalyzerPlugin({
         analyzerMode: "static",
+        reportFilename: path.resolve(
+          __dirname,
+          "webpack-report",
+          "report.html",
+        ),
       }),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin(
@@ -352,6 +387,24 @@ export default {
       emitWarning: true, // Emit warnings instead of errors
       overrideConfigFile: path.resolve(__dirname, ".eslintrc.js"), // Custom ESLint config
     }),
+    // Moment.js is an extremely popular library that bundles large locale files
+    // by default due to how webpack interprets its code. This is a practical
+    // solution that requires the user to opt into importing specific locales.
+    // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
+    // You can remove this if you don't use Moment.js:
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
+    }),
+    // enable gzip compression for all the JS and css files chunks
+    webpackMode === "production" &&
+      new CompressionPlugin({
+        filename: "[path][base].gz",
+        algorithm: "gzip",
+        test: /\.(js|css)$/i, // Compress all .js files
+        threshold: 0, // Compress all files, regardless of size
+        minRatio: 0.8,
+      }),
   ].filter(Boolean),
 
   devServer: {
