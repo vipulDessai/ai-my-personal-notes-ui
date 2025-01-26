@@ -3,4 +3,3 @@ declare const styles: {
   readonly "notes-holder": string;
 };
 export = styles;
-

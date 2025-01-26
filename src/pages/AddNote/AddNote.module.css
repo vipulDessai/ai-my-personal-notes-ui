@@ -149,7 +149,7 @@
   }
 }
 
- /* placed outside because the menu is a react portal */
+/* placed outside because the menu is a react portal */
 .note-catcher-form-field-menu-icon {
   width: 35px;
   display: inline-flex;

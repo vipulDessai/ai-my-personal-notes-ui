@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 
-import Home from "../pages/index";
+import Home from "../src/pages/Home";
 
 import { useRouter } from "../__mocks__/next/router";
 

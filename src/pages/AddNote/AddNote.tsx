@@ -25,18 +25,16 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 
-import commonStyles from "../styles/common.module.css";
-import addNoteStyles from "./add-note.module.css";
+import commonStyles from "../../styles/common.module.css";
+import addNoteStyles from "./AddNote.module.css";
 
-import { Header, Footer } from "../components";
 import {
   APP_DATE_TIME_FORMAT,
   FORM_FIELD_INPUT_TYPES,
   FORM_FIELD_REPOSE_DIRECTION,
   FORM_FIELD_RESIZE_DIRECTION,
   iconComponents,
-  pageTitles,
-} from "../components/utils";
+} from "../../components/utils";
 import {
   ADD_INPUT_MENU_TYPE,
   AppDispatch,
@@ -58,12 +56,12 @@ import {
   TagsData,
   setEditPrimaryMeta,
   setTagsForField,
-} from "../components/stores";
-import { CustomInputBox } from "../components/elements";
+} from "../../components/stores";
+import { CustomInputBox } from "../../components/elements";
 
 /** GQL <START> */
-import { gql } from "../gql";
-import { NoteInputsInput } from "../gql/graphql";
+import { gql } from "../../gql";
+import { NoteInputsInput } from "../../gql/graphql";
 /** GQL <END> */
 
 const {
@@ -238,13 +236,6 @@ export default function AddNote() {
 
   return (
     <div className={commonStyles.container}>
-      {/* <Head>
-        <title>{pageTitles.ADD_NOTE}</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head> */}
-
-      <Header />
-
       <main className={addNoteStyles["note-catcher"]}>
         <section className={addNoteStyles["basic-details"]}>
           <ul className={addNoteStyles["meta-data-read-only"]}>
@@ -483,8 +474,6 @@ export default function AddNote() {
           <CircularProgress color="inherit" />
         </Snackbar>
       </main>
-
-      <Footer />
     </div>
   );
 }

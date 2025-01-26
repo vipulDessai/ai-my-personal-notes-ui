@@ -8,10 +8,10 @@ const config: CodegenConfig = {
   overwrite: true,
   // TODO: pick the url automatically based on the env
   // schema: "https://7ryqgloudd.execute-api.us-east-1.amazonaws.com/graphql",
-  schema: "https://localhost:8081/graphql",
-  documents: ["components/**/*.tsx", "pages/**/*.tsx"],
+  schema: "http://localhost:8081/graphql",
+  documents: ["src/components/**/*.tsx", "src/pages/**/*.tsx"],
   generates: {
-    "gql/": {
+    "src/gql/": {
       preset: "client",
       plugins: [],
       presetConfig: {

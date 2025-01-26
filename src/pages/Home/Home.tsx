@@ -9,15 +9,14 @@ import {
 } from "@mui/material";
 import { useLazyQuery } from "@apollo/client";
 
-import commonStyles from "../styles/common.module.css";
-import homePageStyles from "./index.module.css";
+import * as commonStyles from "../../styles/common.module.css";
+import * as homePageStyles from "./Home.module.css";
 
-import { Header, Footer } from "../components";
-import { pageTitles, toDictionary, iconComponents } from "../components/utils";
+import { toDictionary, iconComponents } from "../../components/utils";
 
 const { SearchIcon } = iconComponents;
 
-import { gql } from "../gql";
+import { gql } from "../../gql";
 
 const GET_NOTES_QUERY = gql(`
   query getNoteInBatch($size: Int!, $page: Int!) {
@@ -94,14 +93,7 @@ export default function Home() {
   const tagsDataDictionary = toDictionary(tagsData, "key", "value");
 
   return (
-    <div className={commonStyles.container}>
-      {/* <Head>
-        <title>{pageTitles.HOME}</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head> */}
-
-      <Header />
-
+    <div className={commonStyles["container"]}>
       <main>
         <section className={homePageStyles["notes-holder"]}>
           {/* TODO: properly show the error */}
@@ -170,8 +162,6 @@ export default function Home() {
           <SearchIcon />
         </Fab>
       </main>
-
-      <Footer />
     </div>
   );
 }

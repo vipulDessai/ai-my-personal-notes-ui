@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 
-import Home from "../pages/index";
-import AddNote from "../pages/add-note";
+import Home from "../src/pages/Home";
+import AddNote from "../src/pages/AddNote/AddNote";
 
 import { useDispatch, useSelector } from "../__mocks__/react-redux";
 import { useRouter } from "../__mocks__/next/router";

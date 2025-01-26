@@ -5,14 +5,14 @@ declare const styles: {
   readonly "add-note-modal": string;
   readonly "basic-details": string;
   readonly "chip-for-tags": string;
-  readonly "date": string;
+  readonly date: string;
   readonly "edit-meta-data-date": string;
   readonly "field-container": string;
   readonly "formfield-holder": string;
   readonly "highlight-mask": string;
   readonly "input-meta-data": string;
   readonly "loading-content": string;
-  readonly "menu": string;
+  readonly menu: string;
   readonly "menu-option": string;
   readonly "meta-data-list": string;
   readonly "meta-data-read-only": string;
@@ -37,4 +37,3 @@ declare const styles: {
   readonly "tags-searcher": string;
 };
 export = styles;
-

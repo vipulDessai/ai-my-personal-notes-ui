@@ -20,7 +20,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
 /** Material UI Icons <END> */
 
-import logo from "../../public/note-manager-app-main-logo.svg";
+import logo from "../../../public/note-manager-app-main-logo.svg";
 
 export const svg = {
   logo,

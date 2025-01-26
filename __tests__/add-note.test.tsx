@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 
-import AddNote from "../pages/add-note";
+import AddNote from "../src/pages/AddNote/AddNote";
 import { useSelector, useDispatch } from "../__mocks__/react-redux";
 
 import { initialState as addNoteStoreState } from "../components/stores";

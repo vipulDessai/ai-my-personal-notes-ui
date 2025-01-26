@@ -1,4 +1,4 @@
-import commonStyles from "../../styles/common.module.scss";
+import commonStyles from "../../styles/common.module.css";
 
 import { iconComponents } from "../utils";
 

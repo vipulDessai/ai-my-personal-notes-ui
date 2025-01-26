@@ -1,10 +1,6 @@
-import React, { Suspense, StrictMode } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./pages/_app";
-
-function Foo({}) {
-  return <section>Foo</section>;
-}
+import App from "./App";
 
 // use the dynamic import for faster app loading in the browser
 async function begin() {
@@ -14,7 +10,7 @@ async function begin() {
   // TODO: Add strictmode here
   root.render(
     <StrictMode>
-      <App Component={Foo} pageProps={{}} />
+      <App />
     </StrictMode>,
   );
 }

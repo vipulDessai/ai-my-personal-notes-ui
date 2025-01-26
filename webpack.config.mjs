@@ -110,7 +110,7 @@ export default {
   mode: webpackMode,
 
   entry: {
-    app: "./index.tsx", // Entry point
+    app: "./src/index.tsx", // Entry point
   },
 
   output: {
@@ -123,7 +123,7 @@ export default {
 
   // Code splitting optimization:
   optimization: {
-    minimize: true,
+    minimize: webpackMode === "production",
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -190,7 +190,8 @@ export default {
           {
             test: /\.tsx?$/,
             exclude: /node_modules/,
-            use: ["babel-loader",
+            use: [
+              "babel-loader",
               {
                 loader: require.resolve("ts-loader"),
                 options: {
@@ -200,9 +201,6 @@ export default {
                     ),
                   }),
                   transpileOnly: skipTypeCheck,
-                  compilerOptions: {
-                    inlineSourceMap: needSourceMaps,
-                  },
                 },
               },
             ],
@@ -302,6 +300,9 @@ export default {
     // Enables React HMR
     new ReactRefreshWebpackPlugin({
       overlay: false,
+    }),
+    new webpack.ProvidePlugin({
+      React: "react",
     }),
     new webpack.DefinePlugin(envStringified),
     new MiniCssExtractPlugin({
@@ -418,5 +419,5 @@ export default {
   // hidden-source-map
   //   - Use hidden-source-map or nosources-source-map to avoid exposing sensitive source code.
   //   - Serve .map files selectively or restrict access to them.
-  devtool: needSourceMaps ? "inline-source-map" : "hidden-source-map",
+  devtool: needSourceMaps ? "source-map" : "hidden-source-map",
 };
