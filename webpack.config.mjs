@@ -190,13 +190,7 @@ export default {
           {
             test: /\.tsx?$/,
             exclude: /node_modules/,
-            use: [
-              {
-                loader: "babel-loader",
-                options: {
-                  presets: ["@babel/preset-env", "@babel/preset-react"],
-                },
-              },
+            use: ["babel-loader",
               {
                 loader: require.resolve("ts-loader"),
                 options: {
@@ -217,7 +211,7 @@ export default {
             },
           },
 
-          // process the react dependencies
+          // process the dependencies
           {
             test: /\.(js|cjs)$/,
             include: /node_modules/,
@@ -225,7 +219,6 @@ export default {
             use: {
               loader: "babel-loader",
               options: {
-                presets: ["@babel/preset-env"],
                 // Babel sourcemaps are needed for debugging into node_modules
                 // code.  Without the options below, debuggers like VSCode
                 // show incorrect code and set breakpoints on the wrong lines.
