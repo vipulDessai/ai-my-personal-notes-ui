@@ -1,0 +1,204 @@
+.note-catcher {
+  --basic-details-height: 100px;
+  position: relative;
+  .basic-details {
+    width: 95%;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+    ul.meta-data-read-only {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      & > li:nth-child(1) {
+        max-width: 100%;
+        label {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          display: inline-block;
+          white-space: nowrap;
+        }
+      }
+      & > li:nth-child(2) {
+        margin-left: 10px;
+      }
+    }
+    ul.meta-data-list {
+      position: absolute;
+      top: 0;
+      background: var(--pure-white);
+      width: 100%;
+      & > li:not(:nth-child(1)) {
+        margin-top: 10px;
+      }
+      & > li.save-primary-meta-data {
+        ul {
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
+  }
+  .note-pad {
+    position: relative;
+    height: calc(100% - var(--basic-details-height));
+    overflow: auto;
+    z-index: 0;
+    .note-pad-overflow-content {
+      /* 
+        bottom margin is only to give space for the
+        main add input button, otherwise the inputs added
+        are hidden behind it 
+      */
+      margin-bottom: 100px;
+      .formfield-holder {
+        .field-container {
+          position: relative;
+          display: inline-block;
+          .menu {
+            position: absolute;
+            right: 0;
+            transform: translateX(50%);
+            z-index: 0;
+          }
+          .menu-option {
+            position: absolute;
+          }
+          .move-field-done,
+          .resize-done,
+          .move-field-done {
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+          .resize-left,
+          .move-field-left {
+            left: 0;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+          .resize-right,
+          .move-field-right {
+            right: 0;
+            top: 50%;
+            transform: translate(50%, -50%);
+          }
+          .move-field-up {
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          }
+          .move-field-down {
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 50%);
+          }
+          .rendered-field-parent {
+            position: relative;
+            margin: 8px 0;
+            .highlight-mask {
+              position: absolute;
+              opacity: 0.5;
+              z-index: 1;
+              background-color: red;
+              width: 100%;
+              height: 100%;
+              top: 0;
+              &.ready-for-modification {
+                background-color: greenyellow;
+              }
+            }
+          }
+        }
+        .input-meta-data {
+          position: relative;
+          z-index: 1;
+          .edit-meta-data-date {
+            position: absolute;
+            background: var(--pure-white);
+            padding: 5px;
+            box-shadow: 0px 1px 25px 5px #1565c0;
+            border-radius: 5px;
+            ul {
+              display: flex;
+              align-items: center;
+            }
+            ul.action-buttons {
+              margin-left: 5px;
+              width: 60px;
+              justify-content: space-between;
+            }
+          }
+          .read-only-meta-data {
+            li.date {
+              ul {
+                display: flex;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .add-inputs-message {
+    text-align: center;
+  }
+}
+
+/* placed outside because the menu is a react portal */
+.note-catcher-form-field-menu-icon {
+  width: 35px;
+  display: inline-flex;
+}
+
+.add-note-menu {
+  flex-direction: column;
+  button {
+    margin: 10px 0;
+  }
+}
+
+.add-note-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .modal-content {
+    background-color: var(--black-xl);
+    border-radius: 8px;
+    border: 1px solid var(--black-l);
+    padding: 10px;
+    width: 90%;
+    color: var(--pure-white);
+    .tags-searcher {
+      margin-block-end: 19.92px;
+      input {
+        color: var(--pure-white);
+      }
+    }
+    header {
+      h2 {
+        margin-top: 0;
+      }
+    }
+    .tags-holder {
+      max-height: 400px;
+      overflow: auto;
+      .loading-content {
+        text-align: center;
+      }
+      .chip-for-tags {
+        color: var(--pure-white);
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+    }
+    footer {
+      margin-block-start: 19.92px;
+      text-align: right;
+    }
+  }
+}

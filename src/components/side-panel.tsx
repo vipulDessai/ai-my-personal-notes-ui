@@ -1,0 +1,106 @@
+import { useState } from "react";
+import {
+  Box,
+  IconButton,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  CircularProgress,
+} from "@mui/material";
+
+import { iconComponents, pageTitles } from "./utils";
+import { useSelector } from "react-redux";
+import { RootState } from "./stores";
+
+const { InboxIcon, MailIcon, MenuIcon, AccountCircleIcon } = iconComponents;
+
+export function SidePanel() {
+  const [showSideMenu, setShowSideMenu] = useState(false);
+
+  const isLoading = useSelector(
+    (state: RootState) => state.root.user.isLoading,
+  );
+
+  const toggleDrawer =
+    (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+      if (
+        event.type === "keydown" &&
+        ((event as React.KeyboardEvent).key === "Tab" ||
+          (event as React.KeyboardEvent).key === "Shift")
+      ) {
+        return;
+      }
+
+      setShowSideMenu(open);
+    };
+
+  const list = () => (
+    <Box
+      sx={{ width: 250 }}
+      role="presentation"
+      onClick={toggleDrawer(false)}
+      onKeyDown={toggleDrawer(false)}
+    >
+      <List>
+        <ListItem>
+          {isLoading && <CircularProgress color="inherit" />}
+          {!isLoading && (
+            <>
+              <ListItemIcon>
+                <AccountCircleIcon />
+              </ListItemIcon>
+              <ListItemText primary={"User"} />
+            </>
+          )}
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              // TODO: add react router
+              // router.push("/");
+            }}
+          >
+            <ListItemIcon>
+              <InboxIcon />
+            </ListItemIcon>
+            <ListItemText primary={pageTitles.HOME} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              // TODO: add react router
+              // router.push("/add-note");
+            }}
+          >
+            <ListItemIcon>
+              <MailIcon />
+            </ListItemIcon>
+            <ListItemText primary={pageTitles.ADD_NOTE} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+    </Box>
+  );
+
+  return (
+    <nav>
+      <IconButton aria-label="side menu" onClick={toggleDrawer(true)}>
+        <MenuIcon />
+      </IconButton>
+      <Drawer anchor={"left"} open={showSideMenu} onClose={toggleDrawer(false)}>
+        {list()}
+      </Drawer>
+    </nav>
+  );
+}

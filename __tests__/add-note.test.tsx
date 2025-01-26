@@ -1,12 +1,21 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 
-import AddNote from "../pages/add-note";
-import { useSelector } from "../__mocks__/react-redux";
+import AddNote from "../src/pages/AddNote/AddNote";
+import { useSelector, useDispatch } from "../__mocks__/react-redux";
+
+import { initialState as addNoteStoreState } from "../components/stores";
+
+jest.mock("../components/Header");
 
 describe("Add Note", () => {
   it("renders the add note page", () => {
-    useSelector.mockImplementation(() => ({ formFields: [] }));
+    useSelector.mockImplementation(() => ({ ...addNoteStoreState }));
+    useDispatch.mockImplementation(() => {
+      return () => {};
+    });
+
+    addNoteStoreState;
 
     render(<AddNote />);
 
